@@ -392,7 +392,7 @@ export const WarehouseDetail: React.FC = () => {
       };
 
       const result = await updateWarehouseStockQuantity(
-        selectedStockItem._id,
+        selectedStockItem.id,
         payload,
       );
 
@@ -660,7 +660,7 @@ export const WarehouseDetail: React.FC = () => {
             </thead>
             <tbody className="divide-y">
               {filteredStockItems.map((item) => (
-                <tr key={item._id} className="hover:bg-slate-50">
+                <tr key={item.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-medium text-slate-800">
                     {item.inventoryId.productName}
                   </td>
@@ -806,7 +806,7 @@ export const WarehouseDetail: React.FC = () => {
                 >
                   <option value="">Select Storefront...</option>
                   {storefronts.map((sf) => (
-                    <option key={sf._id} value={sf._id}>
+                    <option key={sf.id} value={sf.id}>
                       {sf.locationName} ({sf.locationCode})
                     </option>
                   ))}

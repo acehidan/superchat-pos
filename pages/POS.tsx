@@ -102,7 +102,7 @@ export const POS: React.FC = () => {
 
         // Auto-select first storefront
         if (activeStorefronts.length > 0) {
-          setSelectedStorefrontId(activeStorefronts[0]._id);
+          setSelectedStorefrontId(activeStorefronts[0].id);
         }
       }
 
@@ -170,7 +170,7 @@ export const POS: React.FC = () => {
   const categories = [
     ...new Set(
       allStockItems
-        .filter((item) => item.storefrontId?._id === selectedStorefrontId)
+        .filter((item) => item.storefrontId?.id === selectedStorefrontId)
         .map((item) => item.inventoryId?.category)
         .filter(Boolean),
     ),
@@ -183,16 +183,14 @@ export const POS: React.FC = () => {
     }
 
     setCart((prev) => {
-      const existing = prev.find(
-        (item) => item.stockItem._id === stockItem._id,
-      );
+      const existing = prev.find((item) => item.stockItem.id === stockItem.id);
       if (existing) {
         if (existing.qty + 1 > stockItem.availableQuantity) {
           toast.error(t("pos.cannotExceedStock"));
           return prev;
         }
         return prev.map((item) =>
-          item.stockItem._id === stockItem._id
+          item.stockItem.id === stockItem.id
             ? { ...item, qty: item.qty + 1 }
             : item,
         );
@@ -238,7 +236,7 @@ export const POS: React.FC = () => {
   };
 
   const removeFromCart = (id: string) => {
-    setCart((prev) => prev.filter((item) => item.stockItem._id !== id));
+    setCart((prev) => prev.filter((item) => item.stockItem.id !== id));
   };
 
   // Handle barcode scanning from search input
@@ -247,7 +245,7 @@ export const POS: React.FC = () => {
 
     // Filter products by selected storefront first
     const storefrontProducts = allStockItems.filter((item) => {
-      const matchesStorefront = item.storefrontId?._id === selectedStorefrontId;
+      const matchesStorefront = item.storefrontId?.id === selectedStorefrontId;
       return matchesStorefront;
     });
 
@@ -356,7 +354,7 @@ export const POS: React.FC = () => {
       const orderPayload = {
         storefrontId: selectedStorefrontId,
         ordersProducts: cart.map((item) => ({
-          inventoryId: item.stockItem.inventoryId._id,
+          inventoryId: item.stockItem.inventoryId.id,
           quantity: item.qty,
         })),
         subTotal: subtotal,
@@ -370,11 +368,13 @@ export const POS: React.FC = () => {
           : {}),
       };
 
+      console.log(orderPayload);
+
       const result = await createOrder(orderPayload);
 
       if (result.success) {
         const selectedStorefront = storefronts.find(
-          (sf) => sf._id === selectedStorefrontId,
+          (sf) => sf.id === selectedStorefrontId,
         );
 
         const receiptData = {
@@ -505,7 +505,7 @@ export const POS: React.FC = () => {
               >
                 <Store className="w-4 h-4 text-primary" />
                 <span className="text-sm font-medium max-w-[120px] truncate">
-                  {storefronts.find((sf) => sf._id === selectedStorefrontId)
+                  {storefronts.find((sf) => sf.id === selectedStorefrontId)
                     ?.locationName || "Store"}
                 </span>
                 <ChevronDown
@@ -533,20 +533,20 @@ export const POS: React.FC = () => {
                     <div className="max-h-64 overflow-y-auto">
                       {storefronts.map((sf) => (
                         <button
-                          key={sf._id}
+                          key={sf.id}
                           onClick={() => {
-                            handleStorefrontChange(sf._id);
+                            handleStorefrontChange(sf.id);
                             setShowStorefrontMenu(false);
                           }}
                           className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-primary/10 transition-colors ${
-                            sf._id === selectedStorefrontId
+                            sf.id === selectedStorefrontId
                               ? "bg-primary/20 border-l-4 border-primary"
                               : ""
                           }`}
                         >
                           <div
                             className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                              sf._id === selectedStorefrontId
+                              sf.id === selectedStorefrontId
                                 ? "bg-primary text-dark"
                                 : "bg-dark-100 text-dark-500"
                             }`}
@@ -561,7 +561,7 @@ export const POS: React.FC = () => {
                               {sf.locationCode}
                             </p>
                           </div>
-                          {sf._id === selectedStorefrontId && (
+                          {sf.id === selectedStorefrontId && (
                             <div className="w-2 h-2 rounded-full bg-primary" />
                           )}
                         </button>
@@ -608,7 +608,7 @@ export const POS: React.FC = () => {
           ) : (
             filteredProducts.map((stockItem) => (
               <div
-                key={stockItem._id}
+                key={stockItem.id}
                 onClick={() => addToCart(stockItem)}
                 className={`bg-white p-4 rounded-xl shadow-sm border border-dark-200 cursor-pointer transition-all hover:shadow-lg hover:border-primary hover:scale-[1.02] flex flex-col ${
                   stockItem.availableQuantity === 0
@@ -645,7 +645,7 @@ export const POS: React.FC = () => {
           {selectedStorefrontId && (
             <p className="text-xs text-gray-400 mt-1">
               {
-                storefronts.find((sf) => sf._id === selectedStorefrontId)
+                storefronts.find((sf) => sf.id === selectedStorefrontId)
                   ?.locationName
               }
             </p>
@@ -660,7 +660,7 @@ export const POS: React.FC = () => {
           ) : (
             cart.map((item) => (
               <div
-                key={item.stockItem._id}
+                key={item.stockItem.id}
                 className="flex justify-between items-start border-b border-gray-200 pb-4"
               >
                 <div className="flex-1">
@@ -674,7 +674,7 @@ export const POS: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-2 ml-2">
                   <button
-                    onClick={() => updateQty(item.stockItem._id, -1)}
+                    onClick={() => updateQty(item.stockItem.id, -1)}
                     className="p-1 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
                   >
                     <Minus className="w-3 h-3" />
@@ -686,25 +686,25 @@ export const POS: React.FC = () => {
                     value={item.qty}
                     onChange={(e) => {
                       const value = parseInt(e.target.value) || 1;
-                      setQty(item.stockItem._id, value);
+                      setQty(item.stockItem.id, value);
                     }}
                     onBlur={(e) => {
                       // Ensure quantity is at least 1 when input loses focus
                       const value = parseInt(e.target.value) || 1;
                       if (value < 1) {
-                        setQty(item.stockItem._id, 1);
+                        setQty(item.stockItem.id, 1);
                       }
                     }}
                     className="text-sm font-medium w-12 text-center border border-gray-300 rounded px-1 py-1 focus:ring-2 focus:ring-primary focus:border-primary outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <button
-                    onClick={() => updateQty(item.stockItem._id, 1)}
+                    onClick={() => updateQty(item.stockItem.id, 1)}
                     className="p-1 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
                   >
                     <Plus className="w-3 h-3" />
                   </button>
                   <button
-                    onClick={() => removeFromCart(item.stockItem._id)}
+                    onClick={() => removeFromCart(item.stockItem.id)}
                     className="p-1 text-red-500 hover:bg-red-50 rounded ml-2 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -815,7 +815,7 @@ export const POS: React.FC = () => {
                           : `-- ${t("pos.selectCreditPersonOptional")} --`}
                       </option>
                       {creditPersonas.map((persona) => (
-                        <option key={persona._id} value={persona._id}>
+                        <option key={persona.id} value={persona.id}>
                           {persona.name} - {persona.phone}
                         </option>
                       ))}

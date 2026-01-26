@@ -90,13 +90,13 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
                   {String(index + 1).padStart(2, "0")}
                 </td>
                 <td className="px-4 py-3 font-medium">{p.productCode}</td>
-                <td className="px-4 py-3 font-medium">{p.name}</td>
+                <td className="px-4 py-3 font-medium">{p.productName}</td>
                 <td className="px-4 py-3 text-slate-500">{p.category}</td>
                 <td className="px-4 py-3 text-right text-slate-400">
-                  {p.costPrice.toLocaleString()} MMK
+                  {p?.buyingPrice?.toLocaleString()} MMK
                 </td>
                 <td className="px-4 py-3 text-right font-bold text-slate-800">
-                  {p.sellingPrice.toLocaleString()} MMK
+                  {p?.sellingPrice?.toLocaleString()} MMK
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-center gap-2">

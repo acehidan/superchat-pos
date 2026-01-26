@@ -1,7 +1,7 @@
 import axios from "../axios";
 
 export interface StorefrontStockInventory {
-  _id: string;
+  id: string;
   productName: string;
   productCode: string;
   SKU: string;
@@ -12,7 +12,7 @@ export interface StorefrontStockInventory {
 }
 
 export interface StorefrontStockStorefront {
-  _id: string;
+  id: string;
   locationCode: string;
   locationName: string;
   // Legacy support
@@ -21,7 +21,7 @@ export interface StorefrontStockStorefront {
 }
 
 export interface StorefrontStockItem {
-  _id: string;
+  id: string;
   storefrontId: StorefrontStockStorefront;
   inventoryId: StorefrontStockInventory;
   quantity: number;
@@ -45,7 +45,7 @@ interface FetchStorefrontStockResponse {
 }
 
 export const fetchStorefrontStock = async (
-  storefrontId?: string
+  storefrontId?: string,
 ): Promise<FetchStorefrontStockResponse> => {
   try {
     const url = storefrontId
@@ -57,7 +57,8 @@ export const fetchStorefrontStock = async (
     console.error("Error fetching storefront stock:", error);
     return {
       success: false,
-      message: error.response?.data?.message || "Failed to fetch storefront stock",
+      message:
+        error.response?.data?.message || "Failed to fetch storefront stock",
       data: [],
     };
   }

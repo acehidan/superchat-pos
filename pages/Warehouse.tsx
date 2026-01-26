@@ -147,7 +147,7 @@ export const Warehouse: React.FC = () => {
   };
 
   const handleOpenEdit = (profile: WarehouseProfile) => {
-    setEditingId(profile._id);
+    setEditingId(profile.id);
     setFormData({
       warehouseCode: profile.locationCode,
       warehouseName: profile.locationName,
@@ -404,10 +404,10 @@ export const Warehouse: React.FC = () => {
 
                     return (
                       <tr
-                        key={item._id}
+                        key={item.id}
                         className="hover:bg-slate-50 cursor-pointer"
                         onClick={() =>
-                          navigate(`/warehouse/${item.warehouseId._id}`, {
+                          navigate(`/warehouse/${item.warehouseId.id}`, {
                             state: {
                               warehouseName,
                               warehouseCode,
@@ -512,9 +512,9 @@ export const Warehouse: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {warehouseProfiles.map((profile) => (
               <div
-                key={profile._id}
+                key={profile.id}
                 onClick={() =>
-                  navigate(`/warehouse/${profile._id}`, {
+                  navigate(`/warehouse/${profile.id}`, {
                     state: {
                       warehouseName: profile.locationName,
                       warehouseCode: profile.locationCode,

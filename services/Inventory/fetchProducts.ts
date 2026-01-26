@@ -1,10 +1,18 @@
 import axios from "../axios";
 import { Product } from "../../types";
 
+interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
 interface FetchProductsResponse {
   success: boolean;
   message: string;
   data: Product[];
+  pagination: Pagination;
 }
 
 /**

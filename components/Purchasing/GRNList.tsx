@@ -36,7 +36,7 @@ export const GRNList: React.FC<GRNListProps> = ({
   pagination,
 }) => {
   const [grnFilter, setGrnFilter] = useState<"pending" | "completed">(
-    "pending"
+    "pending",
   );
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
@@ -225,7 +225,7 @@ export const GRNList: React.FC<GRNListProps> = ({
                 </tr>
               ) : (
                 filteredGRNs.map((grn) => (
-                  <tr key={grn._id} className="hover:bg-slate-50">
+                  <tr key={grn.id} className="hover:bg-slate-50">
                     <td className="p-4 font-medium text-blue-600">
                       {grn.grnNumber}
                     </td>
@@ -255,7 +255,7 @@ export const GRNList: React.FC<GRNListProps> = ({
                     <td className="p-4">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-bold ${getStatusColor(
-                          grn.status
+                          grn.status,
                         )}`}
                       >
                         {grn.status.toUpperCase()}
@@ -275,18 +275,18 @@ export const GRNList: React.FC<GRNListProps> = ({
                         {grn.status?.toLowerCase() === "pending" && (
                           <button
                             onClick={() =>
-                              handleUpdateStatus(grn._id, "verified")
+                              handleUpdateStatus(grn.id, "verified")
                             }
-                            disabled={updatingId === grn._id}
+                            disabled={updatingId === grn.id}
                             className="text-xs bg-purple-50 text-purple-600 px-3 py-1.5 rounded hover:bg-purple-100 border border-purple-200 font-medium transition-colors flex items-center gap-1 disabled:opacity-50"
                           >
                             <CheckCircle className="w-3 h-3" />
-                            {updatingId === grn._id ? "..." : "Verify"}
+                            {updatingId === grn.id ? "..." : "Verify"}
                           </button>
                         )}
                         {grn.status?.toLowerCase() === "verified" &&
                           grn.lineItems.some(
-                            (item) => item.availableQuantity > 0
+                            (item) => item.availableQuantity > 0,
                           ) && (
                             <button
                               onClick={() => onTransferGRN?.(grn)}

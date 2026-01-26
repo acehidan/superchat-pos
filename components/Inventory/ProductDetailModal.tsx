@@ -26,7 +26,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<"about" | "quantity">("about");
   const [stockTab, setStockTab] = useState<"warehouse" | "storefront">(
-    "storefront"
+    "storefront",
   );
 
   if (!isOpen) return null;
@@ -116,6 +116,39 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     </div>
                   </div>
 
+                  {/* Product Images */}
+                  {product.images && product.images.length > 0 && (
+                    <div>
+                      <p className="text-xs text-slate-500 font-medium mb-3">
+                        Product Images
+                      </p>
+                      <div className="grid grid-cols-3 gap-3">
+                        {product.images.map((image, index) => (
+                          <div
+                            key={image.id || image._id}
+                            className="relative group"
+                          >
+                            <img
+                              src={`https://your-api-base-url/${image.spaceKey}`}
+                              alt={`Product image ${index + 1}`}
+                              className="w-full h-32 object-cover rounded-lg border border-slate-200"
+                              onError={(e) => {
+                                // Fallback if image doesn't load
+                                (e.target as HTMLImageElement).src =
+                                  "/placeholder-image.png";
+                              }}
+                            />
+                            {image.primary && (
+                              <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                                Primary
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Pricing & Profit */}
                   <div className="grid grid-cols-1 gap-4">
                     <div className="bg-slate-50 p-4 rounded-lg border">
@@ -174,14 +207,22 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
                   {/* Product Details Grid */}
                   <div className="grid grid-cols-2 gap-4">
-                    {/* <div>
+                    <div>
                       <p className="text-xs text-slate-500 font-medium mb-1">
                         SKU
                       </p>
                       <p className="text-sm font-mono text-slate-800">
-                        {product.SKU}
+                        {product.SKU || "-"}
                       </p>
-                    </div> */}
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500 font-medium mb-1">
+                        Sale Code
+                      </p>
+                      <p className="text-sm font-mono text-slate-800">
+                        {product.saleCode || "-"}
+                      </p>
+                    </div>
                     <div>
                       <p className="text-xs text-slate-500 font-medium mb-1">
                         {t("inventory.category")}
@@ -190,14 +231,14 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                         {product.category}
                       </p>
                     </div>
-                    {/* <div>
+                    <div>
                       <p className="text-xs text-slate-500 font-medium mb-1">
                         {t("inventory.subCategoryDetails")}
                       </p>
                       <p className="text-sm text-slate-800">
-                        {product.subCategory || "None"}
+                        {product.subCategory || "-"}
                       </p>
-                    </div> */}
+                    </div>
                     <div>
                       <p className="text-xs text-slate-500 font-medium mb-1">
                         {t("inventory.brand")}
@@ -208,39 +249,63 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     </div>
                     <div>
                       <p className="text-xs text-slate-500 font-medium mb-1">
-                        {t("inventory.unitOfMeasureLabel")}
+                        {t("inventory.barcode")}
+                      </p>
+                      <p className="text-sm font-mono text-slate-800">
+                        {product.barcode || "-"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500 font-medium mb-1">
+                        Unit of Measure
                       </p>
                       <p className="text-sm text-slate-800">
                         {product.unitOfMeasure}
                       </p>
                     </div>
-                    {/* <div>
+                    <div>
                       <p className="text-xs text-slate-500 font-medium mb-1">
-                        {t("inventory.productStatus")}
+                        Status
                       </p>
                       <span
-                        className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                           product.status === "active"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
                         }`}
                       >
                         {product.status}
                       </span>
-                    </div> */}
-                  </div>
-
-                  {/* Description */}
-                  {/* {product.description && (
-                    <div>
+                    </div>
+                    <div className="col-span-2">
                       <p className="text-xs text-slate-500 font-medium mb-1">
-                        {t("inventory.productDescription")}
+                        {t("common.description")}
                       </p>
-                      <p className="text-sm text-slate-800 bg-slate-50 p-3 rounded-lg">
-                        {product.description}
+                      <p className="text-sm text-slate-800">
+                        {product.description || "No description available"}
                       </p>
                     </div>
-                  )} */}
+                  </div>
+
+                  {/* Timestamps */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs text-slate-500 font-medium mb-1">
+                        Created At
+                      </p>
+                      <p className="text-sm text-slate-800">
+                        {formatDate(product.createdAt)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500 font-medium mb-1">
+                        Updated At
+                      </p>
+                      <p className="text-sm text-slate-800">
+                        {formatDate(product.updatedAt)}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -345,7 +410,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                                   </span>
                                 </div>
                               </div>
-                            )
+                            ),
                           )}
                         </div>
                       </>
@@ -396,7 +461,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                                   </span>
                                 </div>
                               </div>
-                            )
+                            ),
                           )}
                         </div>
                       </>

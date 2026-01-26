@@ -1,7 +1,7 @@
 import axios from "../axios";
 
 export interface CreditPersona {
-  _id: string;
+  id: string;
   name: string;
   phone: string;
   blacklist: boolean;
@@ -17,17 +17,18 @@ interface FetchCreditPersonasResponse {
   data: CreditPersona[];
 }
 
-export const fetchCreditPersonas = async (): Promise<FetchCreditPersonasResponse> => {
-  try {
-    const response = await axios.get("/credit-persona");
-    return response.data;
-  } catch (error: any) {
-    console.error("Error fetching credit personas:", error);
-    return {
-      success: false,
-      message: error.response?.data?.message || "Failed to fetch credit personas",
-      data: [],
-    };
-  }
-};
-
+export const fetchCreditPersonas =
+  async (): Promise<FetchCreditPersonasResponse> => {
+    try {
+      const response = await axios.get("/credit-persona");
+      return response.data;
+    } catch (error: any) {
+      console.error("Error fetching credit personas:", error);
+      return {
+        success: false,
+        message:
+          error.response?.data?.message || "Failed to fetch credit personas",
+        data: [],
+      };
+    }
+  };

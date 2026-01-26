@@ -149,7 +149,7 @@ export const Storefront: React.FC = () => {
   };
 
   const handleOpenEdit = (profile: StorefrontProfile) => {
-    setEditingId(profile._id);
+    setEditingId(profile.id);
     setFormData({
       storefrontCode: profile.locationCode,
       storefrontName: profile.locationName,
@@ -406,10 +406,10 @@ export const Storefront: React.FC = () => {
 
                     return (
                       <tr
-                        key={item._id}
+                        key={item.id}
                         className="hover:bg-slate-50 cursor-pointer"
                         onClick={() =>
-                          navigate(`/storefront/${item.storefrontId._id}`, {
+                          navigate(`/storefront/${item.storefrontId.id}`, {
                             state: {
                               storefrontName,
                               storefrontCode,
@@ -514,9 +514,9 @@ export const Storefront: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {storefrontProfiles.map((profile) => (
               <div
-                key={profile._id}
+                key={profile.id}
                 onClick={() =>
-                  navigate(`/storefront/${profile._id}`, {
+                  navigate(`/storefront/${profile.id}`, {
                     state: {
                       storefrontName: profile.locationName,
                       storefrontCode: profile.locationCode,

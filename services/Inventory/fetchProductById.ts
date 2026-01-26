@@ -25,26 +25,36 @@ export interface StockAvailability {
   totalQuantity: number;
 }
 
-export interface ProductDetail {
+export interface ProductImage {
+  spaceKey: string;
+  primary: boolean;
+  order: number;
   _id: string;
+  id: string;
+}
+
+export interface ProductDetail {
+  id: string;
   productName: string;
   productCode: string;
+  saleCode: string;
   SKU: string;
+  barcode?: string;
   category: string;
-  subCategory: string;
-  brand: string;
-  description: string;
+  subCategory?: string;
+  brand?: string;
+  description?: string;
   buyingPrice: number;
   sellingPrice: number;
   unitOfMeasure: string;
   reorderPoint: number;
   reorderQuantity: number;
   taxRate: number;
-  status: string;
+  status: "active" | "inactive";
   tags: string[];
+  images: ProductImage[];
   createdAt: string;
   updatedAt: string;
-  __v: number;
   profitMargin: number;
   profitAmount: number;
   stockAvailability: StockAvailability;
@@ -57,7 +67,7 @@ interface FetchProductByIdResponse {
 }
 
 export const fetchProductById = async (
-  productId: string
+  productId: string,
 ): Promise<FetchProductByIdResponse> => {
   try {
     const response = await axios.get(`/inventory/${productId}`);
@@ -71,4 +81,3 @@ export const fetchProductById = async (
     };
   }
 };
-

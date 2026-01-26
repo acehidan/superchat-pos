@@ -68,7 +68,7 @@ interface FetchGRNsParams {
 }
 
 export const fetchGRNs = async (
-  params?: FetchGRNsParams
+  params?: FetchGRNsParams,
 ): Promise<FetchGRNsResponse> => {
   try {
     const { page = 1, limit = 10 } = params || {};

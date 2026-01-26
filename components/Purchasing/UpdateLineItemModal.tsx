@@ -3,7 +3,7 @@ import { Modal } from "../Modal";
 import { Package, Edit2, Save, X } from "lucide-react";
 
 interface LineItem {
-  _id: string;
+  id: string;
   receivedQuantity: number;
   goodQuantity: number;
   badQuantity: number;
@@ -25,7 +25,7 @@ interface UpdateLineItemModalProps {
     lineItemId: string,
     goodQuantity: number,
     badQuantity: number,
-    notes: string
+    notes: string,
   ) => Promise<void>;
   updating: boolean;
 }
@@ -67,7 +67,7 @@ export const UpdateLineItemModal: React.FC<UpdateLineItemModalProps> = ({
 
   const handleSave = async () => {
     if (!lineItem) return;
-    await onSave(lineItem._id, goodQuantity, badQuantity, notes);
+    await onSave(lineItem.id, goodQuantity, badQuantity, notes);
   };
 
   const handleClose = () => {

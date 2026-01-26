@@ -85,21 +85,35 @@ export const Inventory: React.FC = () => {
     taxRate: 0,
     status: "active",
     tags: [],
+    images: [],
   });
 
   // Map API product to local Product type
   const mapApiProductToProduct = (apiProduct: ApiProduct): Product => {
     return {
+      id: apiProduct.id || "",
+      productName: apiProduct.productName,
       productCode: apiProduct.productCode,
-      id: apiProduct.id || apiProduct._id || "",
-      name: apiProduct.productName,
-      category:
-        (apiProduct.category as ProductCategory) || ProductCategory.OTHER,
-      stockWarehouse: apiProduct.stockWarehouse || 0,
-      stockShop: apiProduct.stockShop || 0,
-      costPrice: apiProduct.buyingPrice,
-      sellingPrice: apiProduct.sellingPrice,
-      lowStockThreshold: apiProduct.reorderPoint || 0,
+      saleCode: apiProduct.saleCode || "",
+      SKU: apiProduct.SKU || "",
+      barcode: apiProduct.barcode,
+      category: apiProduct.category,
+      subCategory: apiProduct.subCategory,
+      brand: apiProduct.brand,
+      description: apiProduct.description,
+      buyingPrice: apiProduct.buyingPrice || 0,
+      sellingPrice: apiProduct.sellingPrice || 0,
+      unitOfMeasure: apiProduct.unitOfMeasure || "piece",
+      reorderPoint: apiProduct.reorderPoint || 0,
+      reorderQuantity: apiProduct.reorderQuantity || 0,
+      taxRate: apiProduct.taxRate || 0,
+      status: (apiProduct.status as "active" | "inactive") || "active",
+      tags: apiProduct.tags,
+      images: apiProduct.images,
+      profitMargin: apiProduct.profitMargin || 0,
+      profitAmount: apiProduct.profitAmount || 0,
+      createdAt: apiProduct.createdAt || "",
+      updatedAt: apiProduct.updatedAt || "",
     };
   };
 
@@ -291,14 +305,19 @@ export const Inventory: React.FC = () => {
     setError(null);
 
     try {
-      // Prepare API payload - only include fields that have values (except required ones)
+      // Prepare API payload - include all required fields
       const apiPayload: any = {
         productName: formData.productName,
         productCode: formData.productCode,
+        saleCode: formData.saleCode || `SC-${Date.now()}`, // Generate default if not provided
         category: formData.category || "Unknown",
         buyingPrice: formData.buyingPrice,
         sellingPrice: formData.sellingPrice,
         unitOfMeasure: formData.unitOfMeasure || "piece",
+        reorderPoint: formData.reorderPoint || 0,
+        reorderQuantity: formData.reorderQuantity || 0,
+        taxRate: formData.taxRate || 0,
+        status: formData.status || "active",
       };
 
       // Add SKU only if it has a value, otherwise provide a default
@@ -310,25 +329,14 @@ export const Inventory: React.FC = () => {
       }
 
       // Add optional fields only if they have values
-      if (formData.saleCode) apiPayload.saleCode = formData.saleCode;
       if (formData.barcode) apiPayload.barcode = formData.barcode;
       if (formData.subCategory) apiPayload.subCategory = formData.subCategory;
       if (formData.brand) apiPayload.brand = formData.brand;
       if (formData.description) apiPayload.description = formData.description;
-      if (formData.reorderPoint !== undefined && formData.reorderPoint > 0)
-        apiPayload.reorderPoint = formData.reorderPoint;
-      if (
-        formData.reorderQuantity !== undefined &&
-        formData.reorderQuantity > 0
-      )
-        apiPayload.reorderQuantity = formData.reorderQuantity;
-      if (formData.taxRate !== undefined && formData.taxRate > 0)
-        apiPayload.taxRate = formData.taxRate;
-      if (formData.status) apiPayload.status = formData.status;
       if (formData.tags && formData.tags.length > 0)
         apiPayload.tags = formData.tags;
 
-      await createProduct(apiPayload);
+      await createProduct(apiPayload, formData.images);
 
       setIsModalOpen(false);
       resetForm();
@@ -347,27 +355,27 @@ export const Inventory: React.FC = () => {
   const openEdit = (p: Product) => {
     setEditingId(p.id);
     // Find the full API product to get all details including subCategory
-    const apiProduct = apiProducts.find((ap) => (ap.id || ap._id) === p.id);
+    const apiProduct = apiProducts.find((ap) => ap.id === p.id);
 
     // Map existing product to form data
     setFormData({
-      productName: p.name,
-      productCode: apiProduct?.productCode || "", // Using id as productCode for existing products
-      saleCode: apiProduct?.saleCode || "",
-      SKU: apiProduct?.SKU || "",
-      barcode: apiProduct?.barcode || "",
+      productName: p.productName,
+      productCode: p.productCode,
+      saleCode: p.saleCode,
+      SKU: p.SKU || "",
+      barcode: p.barcode || "",
       category: p.category,
-      subCategory: apiProduct?.subCategory || "",
-      brand: apiProduct?.brand || "",
-      description: apiProduct?.description || "",
-      buyingPrice: p.costPrice,
+      subCategory: p.subCategory || "",
+      brand: p.brand || "",
+      description: p.description || "",
+      buyingPrice: p.buyingPrice,
       sellingPrice: p.sellingPrice,
-      unitOfMeasure: apiProduct?.unitOfMeasure || "piece",
-      reorderPoint: p.lowStockThreshold,
-      reorderQuantity: apiProduct?.reorderQuantity || 0,
-      taxRate: apiProduct?.taxRate || 0,
-      status: apiProduct?.status || "active",
-      tags: apiProduct?.tags || [],
+      unitOfMeasure: p.unitOfMeasure || "piece",
+      reorderPoint: p.reorderPoint,
+      reorderQuantity: p.reorderQuantity || 0,
+      taxRate: p.taxRate || 0,
+      status: p.status || "active",
+      tags: p.tags || [],
     });
 
     setIsModalOpen(true);
@@ -401,7 +409,7 @@ export const Inventory: React.FC = () => {
       if (!searchQuery.trim()) return true;
 
       const query = searchQuery.toLowerCase().trim();
-      const apiProduct = apiProducts.find((ap) => (ap.id || ap._id) === p.id);
+      const apiProduct = apiProducts.find((ap) => ap.id === p.id);
 
       // Search in product name
       if (p.name.toLowerCase().includes(query)) return true;
@@ -481,10 +489,8 @@ export const Inventory: React.FC = () => {
       // Get the actual inventory IDs from apiProducts
       const inventoryIds = selectedProductIds
         .map((productId) => {
-          const apiProduct = apiProducts.find(
-            (ap) => (ap.id || ap._id) === productId,
-          );
-          return apiProduct?._id || apiProduct?.id;
+          const apiProduct = apiProducts.find((ap) => ap.id === productId);
+          return apiProduct?.id;
         })
         .filter((id): id is string => !!id);
 
@@ -532,10 +538,8 @@ export const Inventory: React.FC = () => {
       // Get the actual inventory IDs from apiProducts
       const inventoryIds = selectedProductIds
         .map((productId) => {
-          const apiProduct = apiProducts.find(
-            (ap) => (ap.id || ap._id) === productId,
-          );
-          return apiProduct?._id || apiProduct?.id;
+          const apiProduct = apiProducts.find((ap) => ap.id === productId);
+          return apiProduct?.id;
         })
         .filter((id): id is string => !!id);
 
@@ -783,7 +787,7 @@ export const Inventory: React.FC = () => {
                 >
                   <option value="">Select a warehouse</option>
                   {warehouses.map((warehouse) => (
-                    <option key={warehouse._id} value={warehouse._id}>
+                    <option key={warehouse.id} value={warehouse.id}>
                       {warehouse.locationName} ({warehouse.locationCode})
                     </option>
                   ))}
@@ -875,7 +879,7 @@ export const Inventory: React.FC = () => {
                 >
                   <option value="">Select a storefront</option>
                   {storefronts.map((storefront) => (
-                    <option key={storefront._id} value={storefront._id}>
+                    <option key={storefront.id} value={storefront.id}>
                       {storefront.locationName} ({storefront.locationCode})
                     </option>
                   ))}

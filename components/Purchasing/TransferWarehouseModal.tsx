@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Warehouse, Package } from "lucide-react";
 
 interface WarehouseProfile {
-  _id: string;
+  id: string;
   locationName: string;
   locationCode: string;
 }
@@ -39,7 +39,7 @@ export const TransferWarehouseModal: React.FC<TransferWarehouseModalProps> = ({
   const [selectedWarehouseId, setSelectedWarehouseId] = useState("");
   const [transferItems, setTransferItems] = useState<TransferItem[]>([]);
   const [transferDate, setTransferDate] = useState(
-    new Date().toISOString().split("T")[0]
+    new Date().toISOString().split("T")[0],
   );
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
@@ -90,7 +90,7 @@ export const TransferWarehouseModal: React.FC<TransferWarehouseModalProps> = ({
         ...updated[index],
         quantity: Math.min(
           Math.max(0, quantity),
-          updated[index].availableQuantity
+          updated[index].availableQuantity,
         ),
       };
       return updated;
@@ -140,7 +140,7 @@ export const TransferWarehouseModal: React.FC<TransferWarehouseModalProps> = ({
       toast.error(
         selectedItemsOnly
           ? "Please select at least one item to transfer"
-          : "Please specify at least one item to transfer"
+          : "Please specify at least one item to transfer",
       );
       return;
     }
@@ -229,7 +229,7 @@ export const TransferWarehouseModal: React.FC<TransferWarehouseModalProps> = ({
               >
                 <option value="">Select Warehouse...</option>
                 {warehouses.map((wh) => (
-                  <option key={wh._id} value={wh._id}>
+                  <option key={wh.id} value={wh.id}>
                     {wh.locationName} ({wh.locationCode})
                   </option>
                 ))}
@@ -275,7 +275,7 @@ export const TransferWarehouseModal: React.FC<TransferWarehouseModalProps> = ({
                 <button
                   onClick={() => {
                     setTransferItems((prev) =>
-                      prev.map((item) => ({ ...item, isSelected: true }))
+                      prev.map((item) => ({ ...item, isSelected: true })),
                     );
                   }}
                   className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
@@ -285,7 +285,7 @@ export const TransferWarehouseModal: React.FC<TransferWarehouseModalProps> = ({
                 <button
                   onClick={() => {
                     setTransferItems((prev) =>
-                      prev.map((item) => ({ ...item, isSelected: false }))
+                      prev.map((item) => ({ ...item, isSelected: false })),
                     );
                   }}
                   className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
@@ -355,7 +355,7 @@ export const TransferWarehouseModal: React.FC<TransferWarehouseModalProps> = ({
                                 onChange={(e) =>
                                   updateTransferQuantity(
                                     index,
-                                    Number(e.target.value)
+                                    Number(e.target.value),
                                   )
                                 }
                                 min="0"
@@ -395,7 +395,7 @@ export const TransferWarehouseModal: React.FC<TransferWarehouseModalProps> = ({
                   disabled={
                     !selectedWarehouseId ||
                     transferItems.filter(
-                      (item) => item.isSelected && item.quantity > 0
+                      (item) => item.isSelected && item.quantity > 0,
                     ).length === 0 ||
                     isSubmitting
                   }

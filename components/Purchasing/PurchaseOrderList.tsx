@@ -48,7 +48,7 @@ export const PurchaseOrderList: React.FC<PurchaseOrderListProps> = ({
   onCreateGRN,
 }) => {
   const [poFilter, setPoFilter] = useState<"pending" | "arrived" | "deleted">(
-    "pending"
+    "pending",
   );
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [poToDelete, setPoToDelete] = useState<ApiPurchaseOrder | null>(null);
@@ -61,7 +61,7 @@ export const PurchaseOrderList: React.FC<PurchaseOrderListProps> = ({
     if (poFilter === "deleted") {
       loadDeletedPurchases(
         deletedPagination.currentPage,
-        deletedPagination.itemsPerPage
+        deletedPagination.itemsPerPage,
       );
     } else {
       // Load purchases with status filter
@@ -78,7 +78,7 @@ export const PurchaseOrderList: React.FC<PurchaseOrderListProps> = ({
         loadPurchases(
           pagination.currentPage,
           pagination.itemsPerPage,
-          poFilter
+          poFilter,
         );
       } else {
         toast.error(res.message || "Failed to update status");
@@ -109,7 +109,7 @@ export const PurchaseOrderList: React.FC<PurchaseOrderListProps> = ({
 
     setIsDeleting(true);
     try {
-      const res = await softDeletePurchase(poToDelete._id);
+      const res = await softDeletePurchase(poToDelete.id);
       if (res.success) {
         toast.success("Purchase order deleted successfully");
         loadPurchases(pagination.currentPage, pagination.itemsPerPage);
@@ -139,13 +139,13 @@ export const PurchaseOrderList: React.FC<PurchaseOrderListProps> = ({
     }
 
     try {
-      const res = await restorePurchase(po._id);
+      const res = await restorePurchase(po.id);
       if (res.success) {
         toast.success("Purchase order restored successfully");
         loadPurchases(pagination.currentPage, pagination.itemsPerPage);
         loadDeletedPurchases(
           deletedPagination.currentPage,
-          deletedPagination.itemsPerPage
+          deletedPagination.itemsPerPage,
         );
       } else {
         toast.error(res.message || "Failed to restore purchase order");
@@ -334,7 +334,7 @@ export const PurchaseOrderList: React.FC<PurchaseOrderListProps> = ({
               ) : (
                 displayList.map((po) => {
                   return (
-                    <tr key={po._id} className="hover:bg-slate-50">
+                    <tr key={po.id} className="hover:bg-slate-50">
                       <td className="p-4  ">{po.poNumber}</td>
                       <td className="p-4">
                         {new Date(po.createdAt).toLocaleDateString()}
@@ -388,7 +388,7 @@ export const PurchaseOrderList: React.FC<PurchaseOrderListProps> = ({
                               {po.status === "pending" && (
                                 <button
                                   onClick={() =>
-                                    handleUpdateStatus(po._id, "arrived")
+                                    handleUpdateStatus(po.id, "arrived")
                                   }
                                   className="text-xs bg-green-50 text-green-600 px-3 py-1.5 rounded hover:bg-green-100 border border-green-200 font-medium transition-colors"
                                 >

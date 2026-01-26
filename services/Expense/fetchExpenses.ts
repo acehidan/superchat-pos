@@ -1,7 +1,7 @@
 import axios from "../axios";
 
 export interface LocationInfo {
-  _id: string;
+  id: string;
   type: string;
   locationCode: string;
   locationName: string;
@@ -9,13 +9,13 @@ export interface LocationInfo {
 }
 
 export interface AdminInfo {
-  _id: string;
+  id: string;
   name: string;
   role: string;
 }
 
 export interface Expense {
-  _id: string;
+  id: string;
   category: string;
   amount: number;
   date: string;
@@ -40,10 +40,8 @@ export const fetchExpenses = async (): Promise<FetchExpensesResponse> => {
     console.error("Error fetching expenses:", error);
     return {
       success: false,
-      message:
-        error.response?.data?.message || "Failed to fetch expenses",
+      message: error.response?.data?.message || "Failed to fetch expenses",
       data: [],
     };
   }
 };
-

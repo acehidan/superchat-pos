@@ -15,6 +15,7 @@ import {
   Receipt,
   Shield,
   LogOut,
+  Bot,
 } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { removeAuthToken } from "../services/axios";
@@ -64,6 +65,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     { path: "/credits", label: t("sidebar.creditSales"), icon: CreditCard },
     { path: "/expenses", label: t("sidebar.expenses"), icon: PieChart },
     { path: "/reports", label: t("sidebar.reports"), icon: LayoutDashboard },
+    { path: "/ai-personality", label: "AI Personality", icon: Bot },
     { path: "/accounts", label: t("sidebar.accountManagement"), icon: Shield },
   ];
 
@@ -111,9 +113,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           {menuItems.map((item, index) => {
             const Icon = item.icon;
 
-            // Permission check: Only owner can access Account Management
+            // Permission check: Only owner can access Account Management and AI Personality
             const userRole = adminData?.role || currentUser.role;
             if (item.path === "/accounts" && userRole !== "owner") return null;
+            if (item.path === "/ai-personality" && userRole !== "owner")
+              return null;
             if (
               item.path === "/purchasing" &&
               userRole !== "admin" &&

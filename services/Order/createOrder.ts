@@ -25,8 +25,9 @@ interface CreateOrderResponse {
 }
 
 export const createOrder = async (
-  data: CreateOrderRequest
+  data: CreateOrderRequest,
 ): Promise<CreateOrderResponse> => {
+  console.log("data", data);
   try {
     const response = await axios.post("/order", data);
     return response.data;
@@ -38,4 +39,3 @@ export const createOrder = async (
     };
   }
 };
-

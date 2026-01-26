@@ -1,7 +1,7 @@
 import axios from "../axios";
 
 export interface StorefrontProfile {
-  _id: string;
+  id: string;
   type: string;
   locationCode: string;
   locationName: string;

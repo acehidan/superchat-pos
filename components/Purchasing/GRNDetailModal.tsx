@@ -85,7 +85,7 @@ export const GRNDetailModal: React.FC<GRNDetailModalProps> = ({
     lineItemId: string,
     goodQuantity: number,
     badQuantity: number,
-    notes: string
+    notes: string,
   ) => {
     if (!grnId) return;
 
@@ -164,7 +164,7 @@ export const GRNDetailModal: React.FC<GRNDetailModalProps> = ({
               </div>
               <span
                 className={`inline-block px-3 py-1 rounded-full text-sm font-bold border ${getStatusColor(
-                  grn.status
+                  grn.status,
                 )}`}
               >
                 {grn.status.toUpperCase()}
@@ -228,7 +228,7 @@ export const GRNDetailModal: React.FC<GRNDetailModalProps> = ({
                 </thead>
                 <tbody className="divide-y">
                   {grn.lineItems.map((item) => (
-                    <tr key={item._id} className="hover:bg-slate-50">
+                    <tr key={item.id} className="hover:bg-slate-50">
                       <td className="p-3">
                         <div className="font-medium">
                           {item.inventoryId?.productName || "Unknown Product"}

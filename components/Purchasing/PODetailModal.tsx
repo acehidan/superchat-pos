@@ -54,9 +54,7 @@ export const PODetailModal: React.FC<PODetailModalProps> = ({
   };
 
   const getSupplierName = (supplierId: string) => {
-    const supplier = suppliers.find(
-      (s) => s.id === supplierId || s._id === supplierId
-    );
+    const supplier = suppliers.find((s) => s.id === supplierId);
     return supplier ? supplier.supplierName : "Unknown Supplier";
   };
 
@@ -114,9 +112,9 @@ export const PODetailModal: React.FC<PODetailModalProps> = ({
               </div>
               <div
                 className="font-bold text-lg text-blue-600 truncate"
-                title={purchase._id}
+                title={purchase.id}
               >
-                {purchase._id.substring(0, 12)}...
+                {purchase.id.substring(0, 12)}...
               </div>
             </div>
             <div className="bg-slate-50 p-4 rounded-lg border">
@@ -144,7 +142,7 @@ export const PODetailModal: React.FC<PODetailModalProps> = ({
               </div>
               <span
                 className={`inline-block px-3 py-1 rounded-full text-sm font-bold border ${getStatusColor(
-                  purchase.status
+                  purchase.status,
                 )}`}
               >
                 {purchase.status.toUpperCase()}
@@ -229,7 +227,7 @@ export const PODetailModal: React.FC<PODetailModalProps> = ({
                 </thead>
                 <tbody className="divide-y">
                   {purchase.products.map((product) => (
-                    <tr key={product._id} className="hover:bg-slate-50">
+                    <tr key={product.id} className="hover:bg-slate-50">
                       <td className="p-3 font-medium">{product.productName}</td>
                       <td className="p-3 text-slate-600">
                         {product.productCode}
@@ -237,7 +235,7 @@ export const PODetailModal: React.FC<PODetailModalProps> = ({
                       <td className="p-3 text-center">
                         <span
                           className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${getProductStatusColor(
-                            product.productStatus
+                            product.productStatus,
                           )}`}
                         >
                           {product.productStatus === "received" ? (

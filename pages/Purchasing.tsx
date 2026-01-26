@@ -96,7 +96,7 @@ export const Purchasing: React.FC = () => {
   const loadPurchases = async (
     page: number = 1,
     limit: number = 10,
-    status: "pending" | "arrived" = "pending"
+    status: "pending" | "arrived" = "pending",
   ) => {
     try {
       const res = await fetchPurchases({ page, limit, status });
@@ -144,22 +144,22 @@ export const Purchasing: React.FC = () => {
   };
 
   const handleCreateGRNFromPO = (po: ApiPurchaseOrder) => {
-    setSelectedPOId(po._id);
+    setSelectedPOId(po.id);
     setIsCreateGRNModalOpen(true);
   };
 
   const handleViewPO = (po: ApiPurchaseOrder) => {
-    setSelectedPOId(po._id);
+    setSelectedPOId(po.id);
     setIsPODetailModalOpen(true);
   };
 
   const handleViewGRN = (grn: GRNData) => {
-    setSelectedGRNId(grn._id);
+    setSelectedGRNId(grn.id);
     setIsGRNDetailModalOpen(true);
   };
 
   const handleTransferGRN = (grn: GRNData) => {
-    setTransferGRNId(grn._id);
+    setTransferGRNId(grn.id);
     setIsTransferModalOpen(true);
   };
 

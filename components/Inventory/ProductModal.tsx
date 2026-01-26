@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Plus, X } from "lucide-react";
 import { Product } from "../../types";
 import { useLanguage } from "../../context/LanguageContext";
 
@@ -20,7 +21,7 @@ import { useLanguage } from "../../context/LanguageContext";
 export interface ProductFormData {
   productName: string;
   productCode: string;
-  saleCode?: string;
+  saleCode: string;
   SKU: string;
   barcode?: string;
   category: string;
@@ -30,20 +31,20 @@ export interface ProductFormData {
   buyingPrice: number;
   sellingPrice: number;
   unitOfMeasure: string;
-  reorderPoint?: number;
-  reorderQuantity?: number;
-  taxRate?: number;
-  status?: string;
+  reorderPoint: number;
+  reorderQuantity: number;
+  taxRate: number;
+  status: "active" | "inactive";
   tags?: string[];
+  images?: File[];
 }
 
 export interface ApiProduct {
-  _id?: string;
-  id?: string;
+  id: string;
   productName: string;
   productCode: string;
-  saleCode?: string;
-  SKU: string;
+  saleCode: string;
+  SKU?: string;
   barcode?: string;
   category: string;
   subCategory?: string;
@@ -52,13 +53,24 @@ export interface ApiProduct {
   buyingPrice: number;
   sellingPrice: number;
   unitOfMeasure: string;
-  reorderPoint?: number;
-  reorderQuantity?: number;
-  taxRate?: number;
-  status?: string;
+  reorderPoint: number;
+  reorderQuantity: number;
+  taxRate: number;
+  status: "active" | "inactive";
   tags?: string[];
-  stockWarehouse?: number;
-  stockShop?: number;
+  images?: ProductImage[];
+  profitMargin: number;
+  profitAmount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProductImage {
+  _id: string;
+  spaceKey: string;
+  url: string;
+  primary: boolean;
+  order: number;
 }
 
 interface ProductModalProps {
@@ -91,6 +103,50 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   // Combobox states for category and subCategory
   const [categoryInput, setCategoryInput] = useState("");
   const [categoryShowDropdown, setCategoryShowDropdown] = useState(false);
+
+  // Image upload state
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
+  // Handle image upload
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const validFiles = files.filter((file): file is File =>
+      file.type.startsWith("image/"),
+    );
+
+    if (validFiles.length > 0) {
+      // Create preview URLs
+      const previews = validFiles.map((file) => URL.createObjectURL(file));
+      setImagePreviews((prev) => [...prev, ...previews]);
+
+      // Update form data with files
+      onFormDataChange({
+        ...formData,
+        images: [...(formData.images || []), ...validFiles],
+      });
+    }
+  };
+
+  // Remove image
+  const removeImage = (index: number) => {
+    const newImages = formData.images?.filter((_, i) => i !== index) || [];
+    const newPreviews = imagePreviews.filter((_, i) => i !== index);
+
+    // Revoke object URL to prevent memory leaks
+    if (imagePreviews[index]) {
+      URL.revokeObjectURL(imagePreviews[index]);
+    }
+
+    setImagePreviews(newPreviews);
+    onFormDataChange({ ...formData, images: newImages });
+  };
+
+  // Cleanup previews on unmount
+  React.useEffect(() => {
+    return () => {
+      imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
+    };
+  }, [imagePreviews]);
   // const [subCategoryInput, setSubCategoryInput] = useState("");
   // const [subCategoryShowDropdown, setSubCategoryShowDropdown] = useState(false);
 
@@ -373,6 +429,61 @@ export const ProductModal: React.FC<ProductModalProps> = ({
             />
           </div>
         </div>
+
+        {/* Image Upload Section */}
+        <div className="mb-4">
+          <label className="block text-xs font-bold text-slate-500 mb-2">
+            Product Images
+          </label>
+
+          {/* Image Upload Input */}
+          <div className="border-2 border-dashed border-slate-300 rounded-lg p-4 text-center">
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+              id="image-upload"
+            />
+            <label
+              htmlFor="image-upload"
+              className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Add Images
+            </label>
+            <p className="text-xs text-slate-500 mt-2">
+              Upload multiple product images (JPG, PNG, etc.)
+            </p>
+          </div>
+
+          {/* Image Previews */}
+          {imagePreviews.length > 0 && (
+            <div className="mt-4 grid grid-cols-3 gap-3">
+              {imagePreviews.map((preview, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={preview}
+                    alt={`Product image ${index + 1}`}
+                    className="w-full h-24 object-cover rounded-lg border"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                  <div className="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded">
+                    {index === 0 ? "Primary" : `Image ${index + 1}`}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         <div className="flex justify-end gap-2">
           <button
             onClick={onClose}

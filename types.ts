@@ -23,18 +23,38 @@ export enum ProductCategory {
   OTHER = "Other",
 }
 
+export interface ProductImage {
+  _id: string;
+  spaceKey: string;
+  url: string;
+  primary: boolean;
+  order: number;
+}
+
 export interface Product {
   id: string;
-  _id?: string;
-  name: string;
-  productName?: string;
-  productCode?: string;
-  category: ProductCategory;
-  stockWarehouse: number;
-  stockShop: number;
-  costPrice: number;
+  productName: string;
+  productCode: string;
+  saleCode: string;
+  SKU?: string;
+  barcode?: string;
+  category: string;
+  subCategory?: string;
+  brand?: string;
+  description?: string;
+  buyingPrice: number;
   sellingPrice: number;
-  lowStockThreshold: number;
+  unitOfMeasure: string;
+  reorderPoint: number;
+  reorderQuantity: number;
+  taxRate: number;
+  status: "active" | "inactive";
+  tags?: string[];
+  images?: ProductImage[];
+  profitMargin: number;
+  profitAmount: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CartItem extends Product {
@@ -161,7 +181,7 @@ export interface GoodsReceivedNote {
 }
 
 export interface WarehouseProfile {
-  _id: string;
+  id: string;
   type: string;
   locationCode: string;
   locationName: string;

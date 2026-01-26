@@ -23,6 +23,7 @@ import { Orders } from "./pages/Orders";
 import { CreditOrders } from "./pages/CreditOrders";
 import { AccountManagement } from "./pages/AccountManagement";
 import { Login } from "./pages/Login";
+import { AIPersonalityPage } from "./pages/AIPersonality";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const AppLayout: React.FC = () => {
@@ -43,15 +44,15 @@ const AppLayout: React.FC = () => {
                   className="p-2 hover:bg-primary/10 rounded-lg transition-colors mr-3"
                   aria-label="Open menu"
                 >
-                  <Menu className="w-6 h-6 text-primary" />
+                  <Menu className="w-6 h-6 text-white" />
                 </button>
                 {/* <img
             src="/imaslogo.jpg"
             alt="IMAS Logo"
             className="w-10 h-10 object-contain rounded-lg mr-2 shadow-md"
           /> */}
-                <h1 className="text-lg font-bold text-primary tracking-wide">
-                  IMAS POS
+                <h1 className="text-lg font-bold text-white tracking-wide">
+                  Super Chat
                 </h1>
               </div>
               <LanguageSwitcher />
@@ -199,6 +200,14 @@ const AppLayout: React.FC = () => {
             element={
               <ProtectedRoute>
                 <AccountManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ai-personality"
+            element={
+              <ProtectedRoute>
+                <AIPersonalityPage />
               </ProtectedRoute>
             }
           />

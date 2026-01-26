@@ -193,7 +193,7 @@ export const StorefrontDetail: React.FC = () => {
       };
 
       const result = await updateStorefrontStockQuantity(
-        selectedStockItem._id,
+        selectedStockItem.id,
         payload,
       );
 
@@ -455,7 +455,7 @@ export const StorefrontDetail: React.FC = () => {
             </thead>
             <tbody className="divide-y">
               {filteredStockItems.map((item) => (
-                <tr key={item._id} className="hover:bg-slate-50">
+                <tr key={item.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-medium text-slate-800">
                     {item.inventoryId.productName}
                   </td>

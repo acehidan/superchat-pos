@@ -84,7 +84,7 @@ export const Expenses: React.FC = () => {
   };
 
   const handleOpenEdit = (expense: Expense) => {
-    setEditingId(expense._id);
+    setEditingId(expense.id);
     setFormData({
       category: expense.category,
       amount: expense.amount,
@@ -202,7 +202,7 @@ export const Expenses: React.FC = () => {
 
     setIsDeleting(true);
     try {
-      const response = await deleteExpense(expenseToDelete._id);
+      const response = await deleteExpense(expenseToDelete.id);
       if (response.success) {
         toast.success(
           response.message ||
@@ -320,7 +320,7 @@ export const Expenses: React.FC = () => {
             </thead>
             <tbody className="divide-y">
               {expenses.map((expense) => (
-                <tr key={expense._id} className="hover:bg-slate-50">
+                <tr key={expense.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1 text-slate-600">
                       <Calendar className="w-3 h-3" />
@@ -467,7 +467,7 @@ export const Expenses: React.FC = () => {
                   >
                     <option value="">Select Location</option>
                     {locations.map((location) => (
-                      <option key={location._id} value={location._id}>
+                      <option key={location.id} value={location.id}>
                         {location.locationName} ({location.locationCode})
                       </option>
                     ))}
