@@ -52,7 +52,7 @@ export const Login: React.FC = () => {
         );
 
         // Redirect to POS page
-        navigate("/pos");
+        navigate("/social-media-inventory");
       } else {
         toast.error(response.message || t("login.loginFailed"));
       }

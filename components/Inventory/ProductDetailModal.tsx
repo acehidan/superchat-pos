@@ -117,25 +117,29 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   </div>
 
                   {/* Product Images */}
-                  {product.images && product.images.length > 0 && (
-                    <div>
-                      <p className="text-xs text-slate-500 font-medium mb-3">
-                        Product Images
-                      </p>
+                  <div>
+                    <p className="text-xs text-slate-500 font-medium mb-3">
+                      Product Images
+                    </p>
+                    {product.images && product.images.length > 0 ? (
                       <div className="grid grid-cols-3 gap-3">
                         {product.images.map((image, index) => (
                           <div
-                            key={image.id || image._id}
+                            key={image.id || image._id || index}
                             className="relative group"
                           >
                             <img
-                              src={`https://your-api-base-url/${image.spaceKey}`}
-                              alt={`Product image ${index + 1}`}
-                              className="w-full h-32 object-cover rounded-lg border border-slate-200"
+                              src={
+                                image.spaceKey
+                                  ? `https://your-api-base-url/${image.spaceKey}`
+                                  : "/placeholder-product.png"
+                              }
+                              alt={`${product.productName} - Image ${index + 1}`}
+                              className="w-full h-32 object-cover rounded-lg border border-slate-200 hover:border-slate-300 transition-colors"
                               onError={(e) => {
                                 // Fallback if image doesn't load
                                 (e.target as HTMLImageElement).src =
-                                  "/placeholder-image.png";
+                                  "/placeholder-product.png";
                               }}
                             />
                             {image.primary && (
@@ -146,8 +150,17 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                           </div>
                         ))}
                       </div>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="flex items-center justify-center h-32 bg-slate-50 rounded-lg border border-slate-200">
+                        <div className="text-center">
+                          <Package className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+                          <p className="text-xs text-slate-500">
+                            No product images available
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   {/* Pricing & Profit */}
                   <div className="grid grid-cols-1 gap-4">

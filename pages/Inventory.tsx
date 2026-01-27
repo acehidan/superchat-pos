@@ -6,6 +6,7 @@ import { updateProduct } from "../services/Inventory/updateProduct";
 import { fetchProducts } from "../services/Inventory/fetchProducts";
 import { transferInventoryToWarehouse } from "../services/Inventory/transferInventoryToWarehouse";
 import { transferInventoryToStorefront } from "../services/Inventory/transferInventoryToStorefront";
+import { transferInventoryToSocialMedia } from "../services/Inventory/transferInventoryToSocialMedia";
 import { fetchWarehouseProfiles } from "../services/Warehouse/fetchWarehouseProfiles";
 import {
   fetchStorefrontProfiles,
@@ -25,7 +26,7 @@ import {
   ProductDetail,
 } from "../services/Inventory/fetchProductById";
 import { WarehouseProfile } from "../types";
-import { Building2, X, Loader2, Store } from "lucide-react";
+import { Building2, X, Loader2, Store, Share2 } from "lucide-react";
 import { SearchInput } from "../components/Inventory/SearchInput";
 
 export const Inventory: React.FC = () => {
@@ -52,7 +53,7 @@ export const Inventory: React.FC = () => {
   const [isTransferring, setIsTransferring] = useState(false);
   const [showSelectBoxes, setShowSelectBoxes] = useState(false);
   const [transferMode, setTransferMode] = useState<
-    "warehouse" | "storefront" | null
+    "warehouse" | "storefront" | "socialmedia" | null
   >(null);
 
   // Transfer to Storefront State
@@ -61,6 +62,12 @@ export const Inventory: React.FC = () => {
   const [storefronts, setStorefronts] = useState<StorefrontProfile[]>([]);
   const [selectedStorefrontId, setSelectedStorefrontId] = useState("");
   const [isTransferringToStorefront, setIsTransferringToStorefront] =
+    useState(false);
+
+  // Transfer to Social Media State
+  const [isTransferSocialMediaModalOpen, setIsTransferSocialMediaModalOpen] =
+    useState(false);
+  const [isTransferringToSocialMedia, setIsTransferringToSocialMedia] =
     useState(false);
 
   // Search State
@@ -473,6 +480,18 @@ export const Inventory: React.FC = () => {
     setSelectedStorefrontId("");
   };
 
+  const handleOpenTransferSocialMediaModal = () => {
+    if (selectedProductIds.length === 0) {
+      toast.error("Please select at least one product to transfer");
+      return;
+    }
+    setIsTransferSocialMediaModalOpen(true);
+  };
+
+  const handleCloseTransferSocialMediaModal = () => {
+    setIsTransferSocialMediaModalOpen(false);
+  };
+
   const handleTransfer = async () => {
     if (!selectedWarehouseId) {
       toast.error("Please select a warehouse");
@@ -572,6 +591,54 @@ export const Inventory: React.FC = () => {
     }
   };
 
+  const handleTransferToSocialMedia = async () => {
+    if (selectedProductIds.length === 0) {
+      toast.error("Please select at least one product to transfer");
+      return;
+    }
+
+    setIsTransferringToSocialMedia(true);
+    try {
+      // Get the actual inventory IDs from apiProducts
+      const inventoryIds = selectedProductIds
+        .map((productId) => {
+          const apiProduct = apiProducts.find((ap) => ap.id === productId);
+          return apiProduct?.id;
+        })
+        .filter((id): id is string => !!id);
+
+      if (inventoryIds.length === 0) {
+        toast.error("No valid inventory items selected");
+        return;
+      }
+
+      const response = await transferInventoryToSocialMedia({
+        inventoryIds,
+      });
+
+      if (response.success) {
+        toast.success(
+          response.message ||
+            "Inventory transferred to social media successfully",
+        );
+        setSelectedProductIds([]);
+        handleCloseTransferSocialMediaModal();
+        await loadProducts();
+      } else {
+        toast.error(
+          response.message || "Failed to transfer inventory to social media",
+        );
+      }
+    } catch (error: any) {
+      console.error("Error transferring inventory to social media:", error);
+      toast.error(
+        error.message || "Failed to transfer inventory to social media",
+      );
+    } finally {
+      setIsTransferringToSocialMedia(false);
+    }
+  };
+
   // console.log("filteredProducts", filteredProducts);
 
   return (
@@ -611,6 +678,16 @@ export const Inventory: React.FC = () => {
                   <Store className="w-4 h-4" />
                   Transfer to Storefront
                 </button>
+                <button
+                  onClick={() => {
+                    setShowSelectBoxes(true);
+                    setTransferMode("socialmedia");
+                  }}
+                  className="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700 flex items-center gap-2"
+                >
+                  <Share2 className="w-4 h-4" />
+                  Transfer to Social Media
+                </button>
               </>
             )}
 
@@ -632,6 +709,15 @@ export const Inventory: React.FC = () => {
                   >
                     <Store className="w-4 h-4" />
                     Confirm Storefront Transfer ({selectedProductIds.length})
+                  </button>
+                )}
+                {transferMode === "socialmedia" && (
+                  <button
+                    onClick={handleOpenTransferSocialMediaModal}
+                    className="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700 flex items-center gap-2"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    Confirm Social Media Transfer ({selectedProductIds.length})
                   </button>
                 )}
               </>
@@ -917,6 +1003,76 @@ export const Inventory: React.FC = () => {
                   ) : (
                     <>
                       <Store className="w-4 h-4" /> Transfer
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Transfer to Social Media Modal */}
+      {isTransferSocialMediaModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+            <div className="p-6 border-b flex justify-between items-center">
+              <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                <Share2 className="w-5 h-5 text-primary" />
+                Transfer to Social Media
+              </h2>
+              <button
+                onClick={handleCloseTransferSocialMediaModal}
+                disabled={isTransferringToSocialMedia}
+                className="text-slate-400 hover:text-slate-600 p-1 disabled:opacity-50"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="bg-slate-50 p-4 rounded-lg">
+                <p className="text-sm text-slate-500 mb-1">Selected Products</p>
+                <p className="font-bold text-slate-800">
+                  {selectedProductIds.length} product(s) selected
+                </p>
+                <div className="mt-2 text-xs text-slate-600">
+                  {filteredProducts
+                    .filter((p) => selectedProductIds.includes(p.id))
+                    .map((p) => p.name)
+                    .join(", ")}
+                </div>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-sm text-blue-800">
+                  <strong>Note:</strong> This will transfer the selected
+                  inventory items to social media platforms for online sales.
+                </p>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t">
+                <button
+                  type="button"
+                  onClick={handleCloseTransferSocialMediaModal}
+                  disabled={isTransferringToSocialMedia}
+                  className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleTransferToSocialMedia}
+                  disabled={isTransferringToSocialMedia}
+                  className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                >
+                  {isTransferringToSocialMedia ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />{" "}
+                      Transferring...
+                    </>
+                  ) : (
+                    <>
+                      <Share2 className="w-4 h-4" /> Transfer
                     </>
                   )}
                 </button>
