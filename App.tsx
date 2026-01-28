@@ -133,10 +133,7 @@ const AppLayout: React.FC = () => {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/social-media-order-create"
-            element={<SocialMediaOrderCreate />}
-          />
+          <Route path="/order" element={<SocialMediaOrderCreate />} />
           <Route
             path="/suppliers"
             element={
