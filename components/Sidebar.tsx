@@ -64,6 +64,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       label: "Social Media Inventory",
       icon: Share2,
     },
+    {
+      path: "/social-media-order-create",
+      label: "Create Social Order",
+      icon: ShoppingCart,
+    },
     // { path: "/suppliers", label: t("sidebar.suppliers"), icon: Users },
     // { path: "/purchasing", label: t("sidebar.purchasing"), icon: ShoppingBag },
     // { path: "/orders", label: t("sidebar.orders"), icon: Receipt },

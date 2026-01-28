@@ -25,6 +25,7 @@ import { AccountManagement } from "./pages/AccountManagement";
 import { Login } from "./pages/Login";
 import { AIPersonalityPage } from "./pages/AIPersonality";
 import { SocialMediaInventory } from "./pages/SocialMediaInventory";
+import { SocialMediaOrderCreate } from "./pages/SocialMediaOrderCreate";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const AppLayout: React.FC = () => {
@@ -131,6 +132,10 @@ const AppLayout: React.FC = () => {
                 <SocialMediaInventory />
               </ProtectedRoute>
             }
+          />
+          <Route
+            path="/social-media-order-create"
+            element={<SocialMediaOrderCreate />}
           />
           <Route
             path="/suppliers"

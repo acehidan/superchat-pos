@@ -209,6 +209,19 @@ export interface Supplier {
   updatedAt?: string;
 }
 
+export interface SocialMediaOrderProduct {
+  inventoryId: string;
+  quantity: number;
+}
+
+export interface SocialMediaOrderRequest {
+  orderProducts: SocialMediaOrderProduct[];
+  customerName: string;
+  customerPhoneNumber: string;
+  customerAddress: string;
+  deliveryOption: string;
+}
+
 export interface AppState {
   products: Product[];
   sales: Sale[];
