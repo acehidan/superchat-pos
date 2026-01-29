@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Plus,
   Minus,
@@ -10,19 +10,26 @@ import {
   Truck,
   Save,
   X,
+  Package,
 } from "lucide-react";
 import { toast } from "sonner";
 import { createSocialMediaOrder } from "../services/Order/createSocialMediaOrder";
 import { SocialMediaOrderProduct, SocialMediaOrderRequest } from "../types";
+import {
+  fetchProductById,
+  ProductDetail,
+} from "../services/Inventory/fetchProductById";
 import axios from "axios";
 
 interface OrderItem extends SocialMediaOrderProduct {
   productName?: string;
   productCode?: string;
+  productDetail?: ProductDetail;
 }
 
 export const SocialMediaOrderCreate: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [orderItems, setOrderItems] = useState<OrderItem[]>([
     { inventoryId: "", quantity: 1 },
   ]);
@@ -31,11 +38,46 @@ export const SocialMediaOrderCreate: React.FC = () => {
   const [customerAddress, setCustomerAddress] = useState("");
   const [deliveryOption, setDeliveryOption] = useState("cash-on-delivery");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingProduct, setIsLoadingProduct] = useState(false);
 
   const deliveryOptions = [
     { value: "cash-on-delivery", label: "Cash on Delivery" },
     { value: "cash-down", label: "Cash-down" },
   ];
+
+  // Extract inventoryId from URL and fetch product data
+  useEffect(() => {
+    const inventoryId = searchParams.get("inventoryId");
+    if (inventoryId) {
+      fetchProductData(inventoryId);
+    }
+  }, [searchParams]);
+
+  const fetchProductData = async (inventoryId: string) => {
+    setIsLoadingProduct(true);
+    try {
+      const response = await fetchProductById(inventoryId);
+      if (response.success && response.data) {
+        setOrderItems([
+          {
+            inventoryId,
+            quantity: 1,
+            productName: response.data.productName,
+            productCode: response.data.productCode,
+            productDetail: response.data,
+          },
+        ]);
+        toast.success(`Product loaded: ${response.data.productName}`);
+      } else {
+        toast.error(response.message || "Failed to load product");
+      }
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      toast.error("Failed to load product data");
+    } finally {
+      setIsLoadingProduct(false);
+    }
+  };
 
   const addItem = () => {
     setOrderItems([...orderItems, { inventoryId: "", quantity: 1 }]);
@@ -56,6 +98,34 @@ export const SocialMediaOrderCreate: React.FC = () => {
     const newItems = [...orderItems];
     newItems[index] = { ...newItems[index], [field]: value };
     setOrderItems(newItems);
+  };
+
+  const handleInventoryIdChange = async (
+    index: number,
+    inventoryId: string,
+  ) => {
+    updateItem(index, "inventoryId", inventoryId);
+
+    if (inventoryId.trim()) {
+      setIsLoadingProduct(true);
+      try {
+        const response = await fetchProductById(inventoryId);
+        if (response.success && response.data) {
+          const newItems = [...orderItems];
+          newItems[index] = {
+            ...newItems[index],
+            productName: response.data.productName,
+            productCode: response.data.productCode,
+            productDetail: response.data,
+          };
+          setOrderItems(newItems);
+        }
+      } catch (error) {
+        console.error("Error fetching product:", error);
+      } finally {
+        setIsLoadingProduct(false);
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -100,7 +170,7 @@ export const SocialMediaOrderCreate: React.FC = () => {
       };
 
       const response = await axios.post(
-        "https://overearnest-intentional-rosendo.ngrok-free.dev/api/v1/social-media-sale-order",
+        "https://gemini-facebook-integrated.onrender.com/api/v1/social-media-sale-order",
         orderData,
         {
           headers: {
@@ -111,7 +181,11 @@ export const SocialMediaOrderCreate: React.FC = () => {
 
       if (response.data.success) {
         toast.success("Order created successfully!");
-        navigate("/social-media-inventory");
+        // Auto close window after successful order creation
+        setTimeout(() => {
+          console.log("work");
+          window.close();
+        }, 2000);
       } else {
         toast.error(response.data.message || "Failed to create order");
       }
@@ -127,7 +201,7 @@ export const SocialMediaOrderCreate: React.FC = () => {
     <div className="min-h-screen bg-gray-50 p-3 sm:p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
+        {/* <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
@@ -149,7 +223,7 @@ export const SocialMediaOrderCreate: React.FC = () => {
               <X className="w-5 h-5 text-gray-500" />
             </button>
           </div>
-        </div>
+        </div> */}
 
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Order Items */}
@@ -161,56 +235,111 @@ export const SocialMediaOrderCreate: React.FC = () => {
 
             <div className="space-y-3 sm:space-y-4">
               {orderItems.map((item, index) => (
-                <div key={index} className="flex gap-2 sm:gap-3 items-center">
-                  <div className="flex-1">
-                    <input
-                      type="text"
-                      placeholder="Inventory ID"
-                      value={item.inventoryId}
-                      onChange={(e) =>
-                        updateItem(index, "inventoryId", e.target.value)
-                      }
-                      className="w-full px-3 py-2 sm:px-4 sm:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded-lg p-3 sm:p-4"
+                >
+                  <div className="flex gap-2 sm:gap-3 items-start justify-end">
+                    <div className="w-20 sm:w-32">
+                      <input
+                        type="number"
+                        min="1"
+                        placeholder="Qty"
+                        value={item.quantity}
+                        onChange={(e) =>
+                          updateItem(
+                            index,
+                            "quantity",
+                            parseInt(e.target.value) || 1,
+                          )
+                        }
+                        className="w-full px-3 py-2 sm:px-4 sm:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    {/* <button
+                      type="button"
+                      onClick={() => removeItem(index)}
+                      disabled={orderItems.length === 1}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-1"
+                    >
+                      <Minus className="w-4 h-4" />
+                    </button> */}
                   </div>
-                  <div className="w-20 sm:w-32">
-                    <input
-                      type="number"
-                      min="1"
-                      placeholder="Qty"
-                      value={item.quantity}
-                      onChange={(e) =>
-                        updateItem(
-                          index,
-                          "quantity",
-                          parseInt(e.target.value) || 1,
-                        )
-                      }
-                      className="w-full px-3 py-2 sm:px-4 sm:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removeItem(index)}
-                    disabled={orderItems.length === 1}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </button>
+
+                  {/* Product Display */}
+                  {item.productDetail && (
+                    <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                      <div className="flex gap-3">
+                        {/* Product Image */}
+                        {item.productDetail.images &&
+                          item.productDetail.images.length > 0 && (
+                            <div className="flex-shrink-0">
+                              <img
+                                src={`https://res.cloudinary.com/dy3jwsby1/image/upload/${item.productDetail.images[0].spaceKey}`}
+                                alt={item.productDetail.productName}
+                                className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                                onError={(e) => {
+                                  e.currentTarget.src =
+                                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f3f4f6'/%3E%3Ctext x='32' y='32' text-anchor='middle' dy='.3em' font-family='sans-serif' font-size='12' fill='%239ca3af'%3ENo Image%3C/text%3E%3C/svg%3E";
+                                }}
+                              />
+                            </div>
+                          )}
+
+                        {/* Product Info */}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-gray-900 truncate">
+                            {item.productDetail.productName}
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            Code: {item.productDetail.productCode}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Category: {item.productDetail.category}
+                          </p>
+                          <div className="flex items-center gap-4 mt-1">
+                            <p className="text-sm font-medium text-green-600">
+                              ${item.productDetail.sellingPrice}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Stock:{" "}
+                              {
+                                item.productDetail.stockAvailability
+                                  .totalQuantity
+                              }
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Loading State */}
+                  {isLoadingProduct &&
+                    item.inventoryId &&
+                    !item.productDetail && (
+                      <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                        <div className="flex items-center gap-2 text-blue-600">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                          <span className="text-sm">
+                            Loading product data...
+                          </span>
+                        </div>
+                      </div>
+                    )}
                 </div>
               ))}
             </div>
 
-            <button
+            {/* <button
               type="button"
               onClick={addItem}
               className="mt-3 sm:mt-4 flex items-center gap-2 px-3 sm:px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-sm sm:text-base"
             >
               <Plus className="w-4 h-4" />
               Add Item
-            </button>
+            </button> */}
           </div>
 
           {/* Customer Information */}
