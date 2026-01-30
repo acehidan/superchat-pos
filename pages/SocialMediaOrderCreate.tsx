@@ -170,7 +170,7 @@ export const SocialMediaOrderCreate: React.FC = () => {
       };
 
       const response = await axios.post(
-        "https://gemini-facebook-integrated.onrender.com/api/v1/social-media-sale-order",
+        `${process.env.VITE_API_BASE_URL}social-media-sale-order`,
         orderData,
         {
           headers: {
