@@ -39,6 +39,7 @@ export const SocialMediaOrderCreate: React.FC = () => {
   const [deliveryOption, setDeliveryOption] = useState("cash-on-delivery");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingProduct, setIsLoadingProduct] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const deliveryOptions = [
     { value: "cash-on-delivery", label: "Cash on Delivery" },
@@ -170,7 +171,7 @@ export const SocialMediaOrderCreate: React.FC = () => {
       };
 
       const response = await axios.post(
-        `${process.env.VITE_API_BASE_URL}social-media-sale-order`,
+        `${import.meta.env.VITE_API_BASE_URL}social-media-sale-order`,
         orderData,
         {
           headers: {
@@ -181,11 +182,7 @@ export const SocialMediaOrderCreate: React.FC = () => {
 
       if (response.data.success) {
         toast.success("Order created successfully!");
-        // Auto close window after successful order creation
-        setTimeout(() => {
-          console.log("work");
-          window.close();
-        }, 2000);
+        setShowSuccessModal(true);
       } else {
         toast.error(response.data.message || "Failed to create order");
       }
@@ -197,11 +194,64 @@ export const SocialMediaOrderCreate: React.FC = () => {
     }
   };
 
+  const handleConfirmAndClose = () => {
+    // Redirect to Messenger using m.me URL
+    // You can replace 'yourpage' with your actual Facebook page username
+    window.location.href = "https://m.me/yourpage";
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 p-3 sm:p-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        {/* <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
+    <div>
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+                <svg
+                  className="h-6 w-6 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                Order Created Successfully!
+              </h3>
+              <p className="text-sm text-gray-500 mb-6">
+                Your social media order has been created successfully. Click
+                confirm to return to messenger.
+              </p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={() => setShowSuccessModal(false)}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmAndClose}
+                  className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors text-sm"
+                >
+                  Confirm & Return to Messenger
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="min-h-screen bg-gray-50 p-3 sm:p-4">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          {/* <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
@@ -225,39 +275,39 @@ export const SocialMediaOrderCreate: React.FC = () => {
           </div>
         </div> */}
 
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-          {/* Order Items */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
-              <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-              Order Items
-            </h2>
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+            {/* Order Items */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+                <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                Order Items
+              </h2>
 
-            <div className="space-y-3 sm:space-y-4">
-              {orderItems.map((item, index) => (
-                <div
-                  key={index}
-                  className="border border-gray-200 rounded-lg p-3 sm:p-4"
-                >
-                  <div className="flex gap-2 sm:gap-3 items-start justify-end">
-                    <div className="w-20 sm:w-32">
-                      <input
-                        type="number"
-                        min="1"
-                        placeholder="Qty"
-                        value={item.quantity}
-                        onChange={(e) =>
-                          updateItem(
-                            index,
-                            "quantity",
-                            parseInt(e.target.value) || 1,
-                          )
-                        }
-                        className="w-full px-3 py-2 sm:px-4 sm:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    {/* <button
+              <div className="space-y-3 sm:space-y-4">
+                {orderItems.map((item, index) => (
+                  <div
+                    key={index}
+                    className="border border-gray-200 rounded-lg p-3 sm:p-4"
+                  >
+                    <div className="flex gap-2 sm:gap-3 items-start justify-end">
+                      <div className="w-20 sm:w-32">
+                        <input
+                          type="number"
+                          min="1"
+                          placeholder="Qty"
+                          value={item.quantity}
+                          onChange={(e) =>
+                            updateItem(
+                              index,
+                              "quantity",
+                              parseInt(e.target.value) || 1,
+                            )
+                          }
+                          className="w-full px-3 py-2 sm:px-4 sm:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          required
+                        />
+                      </div>
+                      {/* <button
                       type="button"
                       onClick={() => removeItem(index)}
                       disabled={orderItems.length === 1}
@@ -265,74 +315,74 @@ export const SocialMediaOrderCreate: React.FC = () => {
                     >
                       <Minus className="w-4 h-4" />
                     </button> */}
-                  </div>
+                    </div>
 
-                  {/* Product Display */}
-                  {item.productDetail && (
-                    <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                      <div className="flex gap-3">
-                        {/* Product Image */}
-                        {item.productDetail.images &&
-                          item.productDetail.images.length > 0 && (
-                            <div className="flex-shrink-0">
-                              <img
-                                src={`https://res.cloudinary.com/dy3jwsby1/image/upload/${item.productDetail.images[0].spaceKey}`}
-                                alt={item.productDetail.productName}
-                                className="w-16 h-16 object-cover rounded-lg border border-gray-200"
-                                onError={(e) => {
-                                  e.currentTarget.src =
-                                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f3f4f6'/%3E%3Ctext x='32' y='32' text-anchor='middle' dy='.3em' font-family='sans-serif' font-size='12' fill='%239ca3af'%3ENo Image%3C/text%3E%3C/svg%3E";
-                                }}
-                              />
+                    {/* Product Display */}
+                    {item.productDetail && (
+                      <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="flex gap-3">
+                          {/* Product Image */}
+                          {item.productDetail.images &&
+                            item.productDetail.images.length > 0 && (
+                              <div className="flex-shrink-0">
+                                <img
+                                  src={`https://res.cloudinary.com/dy3jwsby1/image/upload/${item.productDetail.images[0].spaceKey}`}
+                                  alt={item.productDetail.productName}
+                                  className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                                  onError={(e) => {
+                                    e.currentTarget.src =
+                                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f3f4f6'/%3E%3Ctext x='32' y='32' text-anchor='middle' dy='.3em' font-family='sans-serif' font-size='12' fill='%239ca3af'%3ENo Image%3C/text%3E%3C/svg%3E";
+                                  }}
+                                />
+                              </div>
+                            )}
+
+                          {/* Product Info */}
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-gray-900 truncate">
+                              {item.productDetail.productName}
+                            </h4>
+                            <p className="text-sm text-gray-600">
+                              Code: {item.productDetail.productCode}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Category: {item.productDetail.category}
+                            </p>
+                            <div className="flex items-center gap-4 mt-1">
+                              <p className="text-sm font-medium text-green-600">
+                                ${item.productDetail.sellingPrice}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                Stock:{" "}
+                                {
+                                  item.productDetail.stockAvailability
+                                    .totalQuantity
+                                }
+                              </p>
                             </div>
-                          )}
-
-                        {/* Product Info */}
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-gray-900 truncate">
-                            {item.productDetail.productName}
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            Code: {item.productDetail.productCode}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Category: {item.productDetail.category}
-                          </p>
-                          <div className="flex items-center gap-4 mt-1">
-                            <p className="text-sm font-medium text-green-600">
-                              ${item.productDetail.sellingPrice}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              Stock:{" "}
-                              {
-                                item.productDetail.stockAvailability
-                                  .totalQuantity
-                              }
-                            </p>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  )}
-
-                  {/* Loading State */}
-                  {isLoadingProduct &&
-                    item.inventoryId &&
-                    !item.productDetail && (
-                      <div className="mt-3 p-3 bg-blue-50 rounded-lg">
-                        <div className="flex items-center gap-2 text-blue-600">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                          <span className="text-sm">
-                            Loading product data...
-                          </span>
-                        </div>
-                      </div>
                     )}
-                </div>
-              ))}
-            </div>
 
-            {/* <button
+                    {/* Loading State */}
+                    {isLoadingProduct &&
+                      item.inventoryId &&
+                      !item.productDetail && (
+                        <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                          <div className="flex items-center gap-2 text-blue-600">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                            <span className="text-sm">
+                              Loading product data...
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                  </div>
+                ))}
+              </div>
+
+              {/* <button
               type="button"
               onClick={addItem}
               className="mt-3 sm:mt-4 flex items-center gap-2 px-3 sm:px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-sm sm:text-base"
@@ -340,114 +390,117 @@ export const SocialMediaOrderCreate: React.FC = () => {
               <Plus className="w-4 h-4" />
               Add Item
             </button> */}
-          </div>
+            </div>
 
-          {/* Customer Information */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
-              <User className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-              Customer Information
-            </h2>
+            {/* Customer Information */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+                <User className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                Customer Information
+              </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Customer Name
-                </label>
-                <input
-                  type="text"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  placeholder="Enter customer name"
-                  className="w-full px-3 py-2 sm:px-4 sm:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number
-                </label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Customer Name
+                  </label>
                   <input
-                    type="tel"
-                    value={customerPhoneNumber}
-                    onChange={(e) => setCustomerPhoneNumber(e.target.value)}
-                    placeholder="09xxxxxxxxx"
-                    className="w-full pl-10 pr-3 py-2 sm:pr-4 sm:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    type="text"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="Enter customer name"
+                    className="w-full px-3 py-2 sm:px-4 sm:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     required
                   />
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Phone Number
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="tel"
+                      value={customerPhoneNumber}
+                      onChange={(e) => setCustomerPhoneNumber(e.target.value)}
+                      placeholder="09xxxxxxxxx"
+                      className="w-full pl-10 pr-3 py-2 sm:pr-4 sm:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-3 sm:mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <MapPin className="inline w-4 h-4 mr-1" />
+                  Delivery Address
+                </label>
+                <textarea
+                  value={customerAddress}
+                  onChange={(e) => setCustomerAddress(e.target.value)}
+                  placeholder="Enter complete delivery address"
+                  rows={3}
+                  className="w-full px-3 py-2 sm:px-4 sm:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  required
+                />
               </div>
             </div>
 
-            <div className="mt-3 sm:mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <MapPin className="inline w-4 h-4 mr-1" />
-                Delivery Address
-              </label>
-              <textarea
-                value={customerAddress}
-                onChange={(e) => setCustomerAddress(e.target.value)}
-                placeholder="Enter complete delivery address"
-                rows={3}
-                className="w-full px-3 py-2 sm:px-4 sm:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                required
-              />
+            {/* Delivery Option */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+                <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                Delivery Option
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {deliveryOptions.map((option) => (
+                  <label
+                    key={option.value}
+                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
+                      deliveryOption === option.value
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="deliveryOption"
+                      value={option.value}
+                      checked={deliveryOption === option.value}
+                      onChange={(e) => setDeliveryOption(e.target.value)}
+                      className="mr-3"
+                    />
+                    <span className="text-gray-700 text-sm">
+                      {option.label}
+                    </span>
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Delivery Option */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
-              <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-              Delivery Option
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {deliveryOptions.map((option) => (
-                <label
-                  key={option.value}
-                  className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                    deliveryOption === option.value
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-gray-300 hover:bg-gray-50"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="deliveryOption"
-                    value={option.value}
-                    checked={deliveryOption === option.value}
-                    onChange={(e) => setDeliveryOption(e.target.value)}
-                    className="mr-3"
-                  />
-                  <span className="text-gray-700 text-sm">{option.label}</span>
-                </label>
-              ))}
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end">
+              <button
+                type="button"
+                onClick={() => navigate("/social-media-inventory")}
+                className="w-full sm:w-auto px-4 sm:px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
+              >
+                <Save className="w-4 h-4" />
+                {isSubmitting ? "Creating..." : "Create Order"}
+              </button>
             </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end">
-            <button
-              type="button"
-              onClick={() => navigate("/social-media-inventory")}
-              className="w-full sm:w-auto px-4 sm:px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
-            >
-              <Save className="w-4 h-4" />
-              {isSubmitting ? "Creating..." : "Create Order"}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );
