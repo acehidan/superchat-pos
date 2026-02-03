@@ -7,7 +7,7 @@ import axios from "../axios";
  */
 export const createWarehouseProfile = async (profileData) => {
   try {
-    const response = await axios.post("/warehouse-profile", profileData);
+    const response = await axios.post("warehouse-profile", profileData);
 
     return response.data;
   } catch (error) {
@@ -20,7 +20,7 @@ export const createWarehouseProfile = async (profileData) => {
         error.response.headers["content-type"].includes("text/html")
       ) {
         throw new Error(
-          `API endpoint not found. Please check if the API is running and the endpoint "${error.config?.url}" is correct.`
+          `API endpoint not found. Please check if the API is running and the endpoint "${error.config?.url}" is correct.`,
         );
       }
 
@@ -34,7 +34,7 @@ export const createWarehouseProfile = async (profileData) => {
 
       if (error.request) {
         throw new Error(
-          "Network error: Unable to reach the API. Please check if the API server is running."
+          "Network error: Unable to reach the API. Please check if the API server is running.",
         );
       }
     }

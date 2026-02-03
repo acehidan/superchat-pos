@@ -42,8 +42,8 @@ export const SocialMediaOrderCreate: React.FC = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const deliveryOptions = [
-    { value: "cash-on-delivery", label: "Cash on Delivery" },
-    { value: "cash-down", label: "Cash-down" },
+    { value: "cash-on-delivery", label: "ငွေကြိုရှင်း" },
+    { value: "cash-down", label: "အိမ်အရောက်ငွေချေ  " },
   ];
 
   // Extract inventoryId from URL and fetch product data
@@ -197,7 +197,8 @@ export const SocialMediaOrderCreate: React.FC = () => {
   const handleConfirmAndClose = () => {
     // Redirect to Messenger using m.me URL
     // You can replace 'yourpage' with your actual Facebook page username
-    window.location.href = "https://m.me/yourpage";
+    window.close();
+    // window.location.href = "https://m.me/yourpage";
   };
 
   return (
@@ -223,24 +224,17 @@ export const SocialMediaOrderCreate: React.FC = () => {
                 </svg>
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Order Created Successfully!
+                အော်ဒါ ဖန်တီးပြီးပါပြီ!
               </h3>
               <p className="text-sm text-gray-500 mb-6">
-                Your social media order has been created successfully. Click
-                confirm to return to messenger.
+                သင့် social media order ကို ဖန်တီးပြီးပါပြီ။ confirm ကိုနှိပ်ပါ။
               </p>
               <div className="flex gap-3 justify-center">
-                <button
-                  onClick={() => setShowSuccessModal(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm"
-                >
-                  Cancel
-                </button>
                 <button
                   onClick={handleConfirmAndClose}
                   className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors text-sm"
                 >
-                  Confirm & Return to Messenger
+                  messegner သို့ ပြန်သွားမည်
                 </button>
               </div>
             </div>
@@ -280,7 +274,7 @@ export const SocialMediaOrderCreate: React.FC = () => {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
               <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
                 <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-                Order Items
+                အော်ဒါ ပစ္စည်းများ
               </h2>
 
               <div className="space-y-3 sm:space-y-4">
@@ -290,23 +284,6 @@ export const SocialMediaOrderCreate: React.FC = () => {
                     className="border border-gray-200 rounded-lg p-3 sm:p-4"
                   >
                     <div className="flex gap-2 sm:gap-3 items-start justify-end">
-                      <div className="w-20 sm:w-32">
-                        <input
-                          type="number"
-                          min="1"
-                          placeholder="Qty"
-                          value={item.quantity}
-                          onChange={(e) =>
-                            updateItem(
-                              index,
-                              "quantity",
-                              parseInt(e.target.value) || 1,
-                            )
-                          }
-                          className="w-full px-3 py-2 sm:px-4 sm:py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          required
-                        />
-                      </div>
                       {/* <button
                       type="button"
                       onClick={() => removeItem(index)}
@@ -320,45 +297,43 @@ export const SocialMediaOrderCreate: React.FC = () => {
                     {/* Product Display */}
                     {item.productDetail && (
                       <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                        <div className="flex gap-3">
-                          {/* Product Image */}
-                          {item.productDetail.images &&
-                            item.productDetail.images.length > 0 && (
-                              <div className="flex-shrink-0">
-                                <img
-                                  src={`https://res.cloudinary.com/dy3jwsby1/image/upload/${item.productDetail.images[0].spaceKey}`}
-                                  alt={item.productDetail.productName}
-                                  className="w-16 h-16 object-cover rounded-lg border border-gray-200"
-                                  onError={(e) => {
-                                    e.currentTarget.src =
-                                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f3f4f6'/%3E%3Ctext x='32' y='32' text-anchor='middle' dy='.3em' font-family='sans-serif' font-size='12' fill='%239ca3af'%3ENo Image%3C/text%3E%3C/svg%3E";
-                                  }}
-                                />
-                              </div>
-                            )}
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          <div>
+                            {/* Product Image */}
+                            {item.productDetail.images &&
+                              item.productDetail.images.length > 0 && (
+                                <div className="flex-shrink-0">
+                                  <img
+                                    src={`https://otas.sgp1.cdn.digitaloceanspaces.com/gemini-chat-bot/${item.productDetail.images[0].spaceKey}`}
+                                    alt={item.productDetail.productName}
+                                    className="w-full h-50 sm:w-40 sm:h-40 object-cover rounded-lg border border-gray-200"
+                                    onError={(e) => {
+                                      e.currentTarget.src =
+                                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f3f4f6'/%3E%3Ctext x='32' y='32' text-anchor='middle' dy='.3em' font-family='sans-serif' font-size='12' fill='%239ca3af'%3ENo Image%3C/text%3E%3C/svg%3E";
+                                    }}
+                                  />
+                                </div>
+                              )}
+                          </div>
 
                           {/* Product Info */}
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-gray-900 truncate">
-                              {item.productDetail.productName}
-                            </h4>
-                            <p className="text-sm text-gray-600">
-                              Code: {item.productDetail.productCode}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              Category: {item.productDetail.category}
-                            </p>
-                            <div className="flex items-center gap-4 mt-1">
-                              <p className="text-sm font-medium text-green-600">
-                                ${item.productDetail.sellingPrice}
+                          <div className="flex-1 min-w-0 items-center justify-center">
+                            <div className="flex flex-col gap-2 justify-center">
+                              <h4 className="font-medium text-gray-900 truncate">
+                                {item.productDetail.productName}
+                              </h4>
+                              <p className="text-sm text-gray-600">
+                                Code: {item.productDetail.productCode}
                               </p>
-                              <p className="text-xs text-gray-500">
-                                Stock:{" "}
-                                {
-                                  item.productDetail.stockAvailability
-                                    .totalQuantity
-                                }
+                              <p className="text-sm text-gray-600">
+                                Category: {item.productDetail.category}
                               </p>
+                              <div className="flex items-center gap-4 mt-1">
+                                <p className="text-sm font-medium text-green-600">
+                                  {item.productDetail.sellingPrice.toLocaleString()}{" "}
+                                  MMK
+                                </p>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -378,6 +353,45 @@ export const SocialMediaOrderCreate: React.FC = () => {
                           </div>
                         </div>
                       )}
+                    <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateItem(
+                            index,
+                            "quantity",
+                            Math.max(1, item.quantity - 1),
+                          )
+                        }
+                        className="p-1 sm:p-2 text-gray-600 hover:bg-gray-100 rounded-l-lg transition-colors"
+                      >
+                        <Minus className="w-3 h-3 sm:w-4 sm:h-4" />
+                      </button>
+                      <input
+                        type="number"
+                        min="1"
+                        placeholder="Qty"
+                        value={item.quantity}
+                        onChange={(e) =>
+                          updateItem(
+                            index,
+                            "quantity",
+                            parseInt(e.target.value) || 1,
+                          )
+                        }
+                        className="w-full px-1 sm:px-2 py-2 text-sm text-center border-0 focus:ring-0 focus:outline-none"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateItem(index, "quantity", item.quantity + 1)
+                        }
+                        className="p-1 sm:p-2 text-gray-600 hover:bg-gray-100 rounded-r-lg transition-colors"
+                      >
+                        <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -396,13 +410,13 @@ export const SocialMediaOrderCreate: React.FC = () => {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
               <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
                 <User className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-                Customer Information
+                ဝယ်ယူသူအချက်အလက်ဖြည့်ရန်
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Customer Name
+                    ဝယ်ယူသူအမည်
                   </label>
                   <input
                     type="text"
@@ -416,7 +430,7 @@ export const SocialMediaOrderCreate: React.FC = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone Number
+                    ဖုန်းနံပါတ်
                   </label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -435,7 +449,7 @@ export const SocialMediaOrderCreate: React.FC = () => {
               <div className="mt-3 sm:mt-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <MapPin className="inline w-4 h-4 mr-1" />
-                  Delivery Address
+                  ပေးပို့ရမည့် လိပ်စာ
                 </label>
                 <textarea
                   value={customerAddress}
@@ -452,7 +466,7 @@ export const SocialMediaOrderCreate: React.FC = () => {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
               <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
                 <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-                Delivery Option
+                ပေးပို့ရမည့် နေရာ
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -496,7 +510,7 @@ export const SocialMediaOrderCreate: React.FC = () => {
                 className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
               >
                 <Save className="w-4 h-4" />
-                {isSubmitting ? "Creating..." : "Create Order"}
+                {isSubmitting ? "ဖန်တီးနေသည်..." : "အော်ဒါ ဖန်တီးမည်"}
               </button>
             </div>
           </form>

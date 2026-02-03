@@ -214,7 +214,8 @@ export const Warehouse: React.FC = () => {
         toast.success(t("warehouse.profileUpdated"));
       } else {
         // Create new warehouse
-        await createWarehouseProfile(payload);
+        const response = await createWarehouseProfile(payload);
+        console.log(response);
         toast.success(t("warehouse.profileCreated"));
       }
 

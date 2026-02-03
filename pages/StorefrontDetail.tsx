@@ -13,6 +13,9 @@ import {
   Loader2,
   Search,
   Filter,
+  ArrowRightLeft,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -23,6 +26,24 @@ import {
   updateStorefrontStockQuantity,
   UpdateStorefrontStockQuantityPayload,
 } from "../services/Storefront/updateStorefrontStockQuantity";
+import { fetchWarehouseProfiles } from "../services/Warehouse/fetchWarehouseProfiles";
+import {
+  fetchStorefrontProfiles,
+  StorefrontProfile,
+} from "../services/Storefront/fetchStorefrontProfiles";
+import {
+  createWarehouseTransfer,
+  TransferLineItem,
+} from "../services/Warehouse/createWarehouseTransfer";
+import { WarehouseProfile } from "../types";
+
+interface TransferFormItem {
+  productCode: string;
+  productName: string;
+  quantity: number;
+  maxQuantity: number;
+  notes: string;
+}
 
 export const StorefrontDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -50,8 +71,23 @@ export const StorefrontDetail: React.FC = () => {
     storefrontInfo?.storefrontCode || "",
   );
 
+  // Transfer Modal State
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [storefronts, setStorefronts] = useState<StorefrontProfile[]>([]);
+  const [warehouses, setWarehouses] = useState<WarehouseProfile[]>([]);
+  const [transferType, setTransferType] = useState<"Warehouse" | "Storefront">(
+    "Warehouse",
+  );
+  const [selectedStorefrontId, setSelectedStorefrontId] = useState("");
+  const [selectedWarehouseId, setSelectedWarehouseId] = useState("");
+  const [transferItems, setTransferItems] = useState<TransferFormItem[]>([]);
+  const [transferNotes, setTransferNotes] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   useEffect(() => {
     loadStorefrontStock();
+    loadWarehouses();
+    loadStorefronts();
   }, [id]);
 
   const loadStorefrontStock = async () => {
@@ -90,6 +126,28 @@ export const StorefrontDetail: React.FC = () => {
       toast.error("Failed to load storefront stock");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadWarehouses = async () => {
+    try {
+      const response = await fetchWarehouseProfiles();
+      if (response.success) {
+        setWarehouses(response.data);
+      }
+    } catch (error) {
+      console.error("Error loading warehouses:", error);
+    }
+  };
+
+  const loadStorefronts = async () => {
+    try {
+      const response = await fetchStorefrontProfiles();
+      if (response.success) {
+        setStorefronts(response.data);
+      }
+    } catch (error) {
+      console.error("Error loading storefronts:", error);
     }
   };
 
@@ -218,6 +276,163 @@ export const StorefrontDetail: React.FC = () => {
     }
   };
 
+  // Transfer Modal Functions
+  const openTransferModal = (item?: StorefrontStockItem) => {
+    if (item) {
+      // Pre-populate with clicked item
+      setTransferItems([
+        {
+          productCode: item.inventoryId.productCode,
+          productName: item.inventoryId.productName,
+          quantity: 1,
+          maxQuantity: item.quantity,
+          notes: "",
+        },
+      ]);
+    } else {
+      setTransferItems([]);
+    }
+    setSelectedStorefrontId("");
+    setSelectedWarehouseId("");
+    setTransferType("Warehouse");
+    setTransferNotes("");
+    setIsTransferModalOpen(true);
+  };
+
+  const addTransferItem = () => {
+    // Get available products (not already in transfer list)
+    const usedCodes = transferItems.map((i) => i.productCode);
+    const availableProducts = stockItems.filter(
+      (item) =>
+        !usedCodes.includes(item.inventoryId.productCode) && item.quantity > 0,
+    );
+
+    if (availableProducts.length === 0) {
+      toast.error("No more products available to add");
+      return;
+    }
+
+    const firstAvailable = availableProducts[0];
+    setTransferItems([
+      ...transferItems,
+      {
+        productCode: firstAvailable.inventoryId.productCode,
+        productName: firstAvailable.inventoryId.productName,
+        quantity: 1,
+        maxQuantity: firstAvailable.quantity,
+        notes: "",
+      },
+    ]);
+  };
+
+  const removeTransferItem = (index: number) => {
+    setTransferItems(transferItems.filter((_, i) => i !== index));
+  };
+
+  const updateTransferItem = (
+    index: number,
+    field: keyof TransferFormItem,
+    value: string | number,
+  ) => {
+    const updated = [...transferItems];
+
+    if (field === "productCode") {
+      // Find the stock item for this product code
+      const stockItem = stockItems.find(
+        (item) => item.inventoryId.productCode === value,
+      );
+      if (stockItem) {
+        updated[index] = {
+          ...updated[index],
+          productCode: value as string,
+          productName: stockItem.inventoryId.productName,
+          maxQuantity: stockItem.quantity,
+          quantity: Math.min(updated[index].quantity, stockItem.quantity),
+        };
+      }
+    } else if (field === "quantity") {
+      const qty = Math.max(
+        1,
+        Math.min(Number(value), updated[index].maxQuantity),
+      );
+      updated[index] = { ...updated[index], quantity: qty };
+    } else {
+      updated[index] = { ...updated[index], [field]: value };
+    }
+
+    setTransferItems(updated);
+  };
+
+  const handleSubmitTransfer = async () => {
+    const destinationId =
+      transferType === "Warehouse" ? selectedWarehouseId : selectedStorefrontId;
+
+    if (!destinationId) {
+      toast.error(`Please select a destination ${transferType.toLowerCase()}`);
+      return;
+    }
+
+    if (transferItems.length === 0) {
+      toast.error("Please add at least one product to transfer");
+      return;
+    }
+
+    // Validate quantities
+    for (const item of transferItems) {
+      if (item.quantity <= 0) {
+        toast.error(`Quantity for ${item.productName} must be greater than 0`);
+        return;
+      }
+      if (item.quantity > item.maxQuantity) {
+        toast.error(
+          `Quantity for ${item.productName} exceeds available stock (${item.maxQuantity})`,
+        );
+        return;
+      }
+    }
+
+    setIsSubmitting(true);
+    try {
+      const lineItems: TransferLineItem[] = transferItems.map((item) => ({
+        productCode: item.productCode,
+        quantity: item.quantity,
+        ...(item.notes && { notes: item.notes }),
+      }));
+
+      const result = await createWarehouseTransfer({
+        sourceType: "Storefront",
+        sourceId: id!,
+        destinationType: transferType,
+        destinationId,
+        lineItems,
+        notes: transferNotes,
+      });
+
+      if (result.success) {
+        toast.success("Transfer created successfully!");
+        setIsTransferModalOpen(false);
+        loadStorefrontStock(); // Refresh stock
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to create transfer");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Get available products for dropdown (not already selected)
+  const getAvailableProductsForItem = (currentCode: string) => {
+    const usedCodes = transferItems
+      .map((i) => i.productCode)
+      .filter((code) => code !== currentCode);
+    return stockItems.filter(
+      (item) =>
+        !usedCodes.includes(item.inventoryId.productCode) && item.quantity > 0,
+    );
+  };
+
   return (
     <div className="p-6">
       {/* Header */}
@@ -242,6 +457,16 @@ export const StorefrontDetail: React.FC = () => {
             Storefront Stock Inventory
           </p>
         </div>
+        {userRole === "owner" && (
+          <button
+            onClick={() => openTransferModal()}
+            disabled={stockItems.length === 0}
+            className="flex items-center gap-2 px-4 py-2 bg-btn-primary hover:bg-btn-primary-hover text-dark rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ArrowRightLeft className="w-4 h-4" />
+            Transfer Stock
+          </button>
+        )}
         <button
           onClick={loadStorefrontStock}
           disabled={loading}
@@ -682,6 +907,290 @@ export const StorefrontDetail: React.FC = () => {
                       {adjustmentType === "increase"
                         ? "Increase Stock"
                         : "Decrease Stock"}
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Transfer Modal */}
+      {isTransferModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b flex justify-between items-center sticky top-0 bg-white z-10">
+              <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                <ArrowRightLeft className="w-5 h-5 text-primary-600" />
+                Transfer to {transferType}
+              </h2>
+              <button
+                onClick={() => setIsTransferModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 p-1"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Source Storefront Info */}
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <p className="text-sm text-primary font-medium">
+                  Source Storefront
+                </p>
+                <p className="text-lg font-bold text-blue-800">
+                  {storefrontName}{" "}
+                  <span className="text-sm font-normal">
+                    ({storefrontCode})
+                  </span>
+                </p>
+              </div>
+
+              {/* Transfer Type Selection */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Transfer Type <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <label
+                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
+                      transferType === "Warehouse"
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="transferType"
+                      value="Warehouse"
+                      checked={transferType === "Warehouse"}
+                      onChange={(e) => {
+                        setTransferType(
+                          e.target.value as "Warehouse" | "Storefront",
+                        );
+                        setSelectedStorefrontId("");
+                        setSelectedWarehouseId("");
+                      }}
+                      className="mr-3"
+                    />
+                    <span className="text-slate-700 text-sm font-medium">
+                      Transfer to Warehouse
+                    </span>
+                  </label>
+                  <label
+                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
+                      transferType === "Storefront"
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="transferType"
+                      value="Storefront"
+                      checked={transferType === "Storefront"}
+                      onChange={(e) => {
+                        setTransferType(
+                          e.target.value as "Warehouse" | "Storefront",
+                        );
+                        setSelectedStorefrontId("");
+                        setSelectedWarehouseId("");
+                      }}
+                      className="mr-3"
+                    />
+                    <span className="text-slate-700 text-sm font-medium">
+                      Transfer to Storefront
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Destination Selection */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Destination {transferType}{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                {transferType === "Warehouse" ? (
+                  <select
+                    className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-primary outline-none"
+                    value={selectedWarehouseId}
+                    onChange={(e) => setSelectedWarehouseId(e.target.value)}
+                  >
+                    <option value="">Select Warehouse...</option>
+                    {warehouses.map((warehouse) => (
+                      <option key={warehouse.id} value={warehouse.id}>
+                        {warehouse.locationName} ({warehouse.locationCode})
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <select
+                    className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-primary outline-none"
+                    value={selectedStorefrontId}
+                    onChange={(e) => setSelectedStorefrontId(e.target.value)}
+                  >
+                    <option value="">Select Storefront...</option>
+                    {storefronts
+                      .filter((storefront) => storefront.id !== id) // Exclude current storefront
+                      .map((storefront) => (
+                        <option key={storefront.id} value={storefront.id}>
+                          {storefront.locationName} ({storefront.locationCode})
+                        </option>
+                      ))}
+                  </select>
+                )}
+              </div>
+
+              {/* Transfer Items */}
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <label className="text-sm font-medium text-slate-700">
+                    Products to Transfer <span className="text-red-500">*</span>
+                  </label>
+                  <button
+                    onClick={addTransferItem}
+                    className="text-sm text-primary-600 hover:text-primary-700 flex items-center gap-1"
+                  >
+                    <Plus className="w-4 h-4" /> Add Product
+                  </button>
+                </div>
+
+                {transferItems.length === 0 ? (
+                  <div className="border-2 border-dashed rounded-lg p-8 text-center text-slate-400">
+                    <p>No products added yet.</p>
+                    <button
+                      onClick={addTransferItem}
+                      className="mt-2 text-primary-600 hover:text-primary-700 font-medium"
+                    >
+                      + Add your first product
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {transferItems.map((item, index) => (
+                      <div
+                        key={index}
+                        className="border rounded-lg p-4 bg-slate-50"
+                      >
+                        <div className="grid grid-cols-12 gap-3">
+                          <div className="col-span-5">
+                            <label className="block text-xs text-slate-500 mb-1">
+                              Product
+                            </label>
+                            <select
+                              className="w-full border rounded p-2 text-sm"
+                              value={item.productCode}
+                              onChange={(e) =>
+                                updateTransferItem(
+                                  index,
+                                  "productCode",
+                                  e.target.value,
+                                )
+                              }
+                            >
+                              {getAvailableProductsForItem(
+                                item.productCode,
+                              ).map((stockItem) => (
+                                <option
+                                  key={stockItem.inventoryId.productCode}
+                                  value={stockItem.inventoryId.productCode}
+                                >
+                                  {stockItem.inventoryId.productName} (
+                                  {stockItem.inventoryId.productCode})
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="col-span-2">
+                            <label className="block text-xs text-slate-500 mb-1">
+                              Qty (max: {item.maxQuantity})
+                            </label>
+                            <input
+                              type="number"
+                              min="1"
+                              max={item.maxQuantity}
+                              className="w-full border rounded p-2 text-sm"
+                              value={item.quantity}
+                              onChange={(e) =>
+                                updateTransferItem(
+                                  index,
+                                  "quantity",
+                                  e.target.value,
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="col-span-4">
+                            <label className="block text-xs text-slate-500 mb-1">
+                              Notes (optional)
+                            </label>
+                            <input
+                              type="text"
+                              className="w-full border rounded p-2 text-sm"
+                              placeholder="Item notes..."
+                              value={item.notes}
+                              onChange={(e) =>
+                                updateTransferItem(
+                                  index,
+                                  "notes",
+                                  e.target.value,
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="col-span-1 flex items-end justify-center">
+                            <button
+                              onClick={() => removeTransferItem(index)}
+                              className="p-2 text-red-500 hover:bg-red-50 rounded"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Transfer Notes */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Notes (optional)
+                </label>
+                <textarea
+                  rows={3}
+                  className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-primary outline-none"
+                  placeholder="Transfer notes..."
+                  value={transferNotes}
+                  onChange={(e) => setTransferNotes(e.target.value)}
+                />
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-end gap-3 pt-4 border-t">
+                <button
+                  type="button"
+                  onClick={() => setIsTransferModalOpen(false)}
+                  className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmitTransfer}
+                  disabled={isSubmitting || transferItems.length === 0}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" /> Processing...
+                    </>
+                  ) : (
+                    <>
+                      <ArrowRightLeft className="w-4 h-4" />
+                      Create Transfer
                     </>
                   )}
                 </button>

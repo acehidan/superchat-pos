@@ -14,6 +14,7 @@ import { CreateGRNModal } from "../components/Purchasing/CreateGRNModal";
 import { GRNDetailModal } from "../components/Purchasing/GRNDetailModal";
 import { PODetailModal } from "../components/Purchasing/PODetailModal";
 import { TransferWarehouseModal } from "../components/Purchasing/TransferWarehouseModal";
+import { TransferStorefrontModal } from "../components/Purchasing/TransferStorefrontModal";
 
 type TabType = "po" | "grn";
 
@@ -57,6 +58,11 @@ export const Purchasing: React.FC = () => {
   const [isGRNDetailModalOpen, setIsGRNDetailModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [transferGRNId, setTransferGRNId] = useState<string | null>(null);
+  const [isStorefrontTransferModalOpen, setIsStorefrontTransferModalOpen] =
+    useState(false);
+  const [storefrontTransferGRNId, setStorefrontTransferGRNId] = useState<
+    string | null
+  >(null);
 
   // Fetch Suppliers and Products
   useEffect(() => {
@@ -163,6 +169,11 @@ export const Purchasing: React.FC = () => {
     setIsTransferModalOpen(true);
   };
 
+  const handleTransferToStorefront = (grn: GRNData) => {
+    setStorefrontTransferGRNId(grn.id);
+    setIsStorefrontTransferModalOpen(true);
+  };
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6 flex items-center gap-2 text-slate-800">
@@ -234,6 +245,7 @@ export const Purchasing: React.FC = () => {
             onStatusChange={loadGRNs}
             onViewGRN={handleViewGRN}
             onTransferGRN={handleTransferGRN}
+            onTransferToStorefront={handleTransferToStorefront}
             pagination={grnPagination}
           />
         </>
@@ -258,6 +270,12 @@ export const Purchasing: React.FC = () => {
         isOpen={isTransferModalOpen}
         onClose={() => setIsTransferModalOpen(false)}
         grnId={transferGRNId}
+        onSuccess={handleGRNSuccess}
+      />
+      <TransferStorefrontModal
+        isOpen={isStorefrontTransferModalOpen}
+        onClose={() => setIsStorefrontTransferModalOpen(false)}
+        grnId={storefrontTransferGRNId}
         onSuccess={handleGRNSuccess}
       />
     </div>

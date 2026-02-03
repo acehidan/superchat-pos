@@ -3,13 +3,16 @@ import axios from "../axios";
 interface TransferLineItem {
   productCode: string;
   quantity: number;
+  inventoryId?: string;
+  notes?: string;
 }
 
 interface TransferGRNRequest {
-  grnId: string;
-  destinationWarehouseId: string;
+  sourceType: "GRN";
+  sourceId: string;
+  destinationType: "Warehouse" | "Storefront";
+  destinationId: string;
   lineItems: TransferLineItem[];
-  transferDate: string;
   notes?: string;
 }
 
@@ -20,7 +23,7 @@ interface TransferGRNResponse {
 }
 
 export const transferGRN = async (
-  data: TransferGRNRequest
+  data: TransferGRNRequest,
 ): Promise<TransferGRNResponse> => {
   try {
     const response = await axios.post("/transfer", data);

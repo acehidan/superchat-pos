@@ -19,6 +19,8 @@ interface TransferItem {
   availableQuantity: number;
   quantity: number;
   isSelected: boolean;
+  inventoryId?: string;
+  notes?: string;
 }
 
 interface TransferWarehouseModalProps {
@@ -38,9 +40,6 @@ export const TransferWarehouseModal: React.FC<TransferWarehouseModalProps> = ({
   const [warehouses, setWarehouses] = useState<WarehouseProfile[]>([]);
   const [selectedWarehouseId, setSelectedWarehouseId] = useState("");
   const [transferItems, setTransferItems] = useState<TransferItem[]>([]);
-  const [transferDate, setTransferDate] = useState(
-    new Date().toISOString().split("T")[0],
-  );
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -68,6 +67,8 @@ export const TransferWarehouseModal: React.FC<TransferWarehouseModalProps> = ({
           availableQuantity: item.availableQuantity,
           quantity: item.availableQuantity,
           isSelected: true,
+          inventoryId: item.inventoryId?.id,
+          notes: "",
         }));
         setTransferItems(items);
       }
@@ -81,6 +82,17 @@ export const TransferWarehouseModal: React.FC<TransferWarehouseModalProps> = ({
     } finally {
       setLoading(false);
     }
+  };
+
+  const updateTransferNotes = (index: number, notes: string) => {
+    setTransferItems((prev) => {
+      const updated = [...prev];
+      updated[index] = {
+        ...updated[index],
+        notes,
+      };
+      return updated;
+    });
   };
 
   const updateTransferQuantity = (index: number, quantity: number) => {
@@ -112,7 +124,6 @@ export const TransferWarehouseModal: React.FC<TransferWarehouseModalProps> = ({
     setGrn(null);
     setSelectedWarehouseId("");
     setTransferItems([]);
-    setTransferDate(new Date().toISOString().split("T")[0]);
     setNotes("");
   };
 
@@ -150,13 +161,15 @@ export const TransferWarehouseModal: React.FC<TransferWarehouseModalProps> = ({
     try {
       const payload = {
         sourceType: "GRN" as const,
-        grnId,
-        destinationWarehouseId: selectedWarehouseId,
+        sourceId: grnId,
+        destinationType: "Warehouse" as const,
+        destinationId: selectedWarehouseId,
         lineItems: itemsToProcess.map((item) => ({
           productCode: item.productCode,
           quantity: item.quantity,
+          ...(item.inventoryId && { inventoryId: item.inventoryId }),
+          ...(item.notes && { notes: item.notes }),
         })),
-        transferDate,
         notes: notes || undefined,
       };
 
@@ -234,19 +247,6 @@ export const TransferWarehouseModal: React.FC<TransferWarehouseModalProps> = ({
                   </option>
                 ))}
               </select>
-            </div>
-
-            {/* Transfer Date */}
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Transfer Date
-              </label>
-              <input
-                type="date"
-                className="w-full border rounded-lg p-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                value={transferDate}
-                onChange={(e) => setTransferDate(e.target.value)}
-              />
             </div>
 
             {/* Notes */}
@@ -335,6 +335,20 @@ export const TransferWarehouseModal: React.FC<TransferWarehouseModalProps> = ({
                       </div>
                       {item.isSelected && (
                         <div className="space-y-3 ml-7">
+                          <div className="col-span-2">
+                            <label className="text-xs text-slate-500 block mb-1">
+                              Item Notes:
+                            </label>
+                            <input
+                              type="text"
+                              className="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500"
+                              value={item.notes || ""}
+                              onChange={(e) =>
+                                updateTransferNotes(index, e.target.value)
+                              }
+                              placeholder="Optional notes..."
+                            />
+                          </div>
                           <div className="grid grid-cols-2 gap-3">
                             <div className="bg-green-50 p-2 rounded border border-green-200">
                               <label className="text-xs text-green-600">

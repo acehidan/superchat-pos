@@ -7,11 +7,11 @@ export interface TransferLineItem {
 }
 
 export interface CreateWarehouseTransferPayload {
-  sourceType: "Warehouse";
-  sourceWarehouseId: string;
-  destinationStorefrontId: string;
+  sourceType: "Warehouse" | "Storefront";
+  sourceId: string;
+  destinationType: "Warehouse" | "Storefront";
+  destinationId: string;
   lineItems: TransferLineItem[];
-  transferDate?: string;
   notes?: string;
 }
 
@@ -22,7 +22,7 @@ interface CreateWarehouseTransferResponse {
 }
 
 export const createWarehouseTransfer = async (
-  payload: CreateWarehouseTransferPayload
+  payload: CreateWarehouseTransferPayload,
 ): Promise<CreateWarehouseTransferResponse> => {
   try {
     const response = await axios.post("/transfer", payload);
@@ -35,9 +35,7 @@ export const createWarehouseTransfer = async (
     console.error("Error creating transfer:", error);
     return {
       success: false,
-      message:
-        error.response?.data?.message || "Failed to create transfer",
+      message: error.response?.data?.message || "Failed to create transfer",
     };
   }
 };
-

@@ -136,8 +136,8 @@ export const POS: React.FC = () => {
   const loadStockItems = async () => {
     try {
       const response = await fetchStorefrontStock();
-      // console.log("response", response);
-      if (response.success && response.data) {
+      console.log("response", response);
+      if (response?.data) {
         setAllStockItems(response.data);
       }
     } catch (error) {
@@ -145,6 +145,8 @@ export const POS: React.FC = () => {
       toast.error(t("pos.failedToLoadProducts"));
     }
   };
+
+  console.log(allStockItems);
 
   const handleRefresh = async () => {
     setLoading(true);
@@ -155,7 +157,7 @@ export const POS: React.FC = () => {
 
   // Filter products by selected storefront and search
   const filteredProducts = allStockItems.filter((item) => {
-    const matchesStorefront = item.storefrontId?._id === selectedStorefrontId;
+    const matchesStorefront = item.storefrontId?.id === selectedStorefrontId;
     const matchesSearch = item.inventoryId?.productName
       ?.toLowerCase()
       .includes(search.toLowerCase());
