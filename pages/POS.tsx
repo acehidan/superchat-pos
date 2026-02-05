@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
@@ -6,9 +6,6 @@ import {
   Plus,
   Minus,
   Trash2,
-  ShoppingCart,
-  CreditCard,
-  DollarSign,
   RefreshCw,
   Store,
   ChevronDown,
@@ -53,6 +50,7 @@ interface CartItem {
 
 export const POS: React.FC = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
 
   // Data State
   const [storefronts, setStorefronts] = useState<StorefrontProfile[]>([]);
@@ -145,8 +143,6 @@ export const POS: React.FC = () => {
       toast.error(t("pos.failedToLoadProducts"));
     }
   };
-
-  console.log(allStockItems);
 
   const handleRefresh = async () => {
     setLoading(true);
@@ -370,8 +366,6 @@ export const POS: React.FC = () => {
           : {}),
       };
 
-      console.log(orderPayload);
-
       const result = await createOrder(orderPayload);
 
       if (result.success) {
@@ -398,8 +392,12 @@ export const POS: React.FC = () => {
           note,
         };
 
-        // Auto-print receipt
-        printThermalReceipt(receiptData, "58mm");
+        // Save receipt data and redirect to receipt page
+        const receiptId = `receipt_${receiptData.invoiceNumber}`;
+        localStorage.setItem(receiptId, JSON.stringify(receiptData));
+
+        // Redirect to receipt page
+        navigate(`/print-receipt/${receiptData.invoiceNumber}`);
         setCart([]);
         setDiscount(0);
         setMarkup(0);

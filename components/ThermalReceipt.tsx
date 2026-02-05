@@ -438,7 +438,7 @@ const ThermalReceipt: React.FC<ThermalReceiptProps> = ({
 // Helper function to print receipt
 export const printThermalReceipt = (
   receiptData: ReceiptData,
-  paperSize: string = "58mm"
+  paperSize: string = "58mm",
 ) => {
   // Create a hidden iframe for printing
   const iframe = document.createElement("iframe");
@@ -629,7 +629,7 @@ export const printThermalReceipt = (
         <div class="order-info">
           <div class="order-row">Order: ${receiptData.invoiceNumber}</div>
           <div class="order-row">${new Date(
-            receiptData.date
+            receiptData.date,
           ).toLocaleString()}</div>
         </div>
         
@@ -651,7 +651,7 @@ export const printThermalReceipt = (
               item.price * item.qty
             ).toLocaleString()}</span>
           </div>
-        `
+        `,
           )
           .join("")}
         

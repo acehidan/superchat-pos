@@ -26,6 +26,7 @@ import { Login } from "./pages/Login";
 import { AIPersonalityPage } from "./pages/AIPersonality";
 import { SocialMediaInventory } from "./pages/SocialMediaInventory";
 import { SocialMediaOrderCreate } from "./pages/SocialMediaOrderCreate";
+import PrintReceipt from "./pages/PrintReceipt";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const AppLayout: React.FC = () => {
@@ -134,6 +135,7 @@ const AppLayout: React.FC = () => {
             }
           />
           <Route path="/order" element={<SocialMediaOrderCreate />} />
+          <Route path="/print-receipt/:orderId" element={<PrintReceipt />} />
           <Route
             path="/suppliers"
             element={
