@@ -89,9 +89,9 @@ const AppLayout: React.FC = () => {
           <Route
             path="/inventory"
             element={
-              <ProtectedRoute>
-                <Inventory />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <Inventory />
+              // </ProtectedRoute>
             }
           />
           <Route
