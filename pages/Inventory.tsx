@@ -69,6 +69,16 @@ export const Inventory: React.FC = () => {
     useState(false);
   const [isTransferringToSocialMedia, setIsTransferringToSocialMedia] =
     useState(false);
+  const DEFAULT_SELLING_GUIDE_PROMPT = "Limited time offer! Get these exclusive";
+  const DEFAULT_BUYING_GUIDE_PROMPT =
+    "Please check the size chart before purchasing. Returns are accepted within 17 days.";
+
+  const [sellingGuidePrompt, setSellingGuidePrompt] = useState(
+    DEFAULT_SELLING_GUIDE_PROMPT,
+  );
+  const [buyingGuidePrompt, setBuyingGuidePrompt] = useState(
+    DEFAULT_BUYING_GUIDE_PROMPT,
+  );
 
   // Search State
   const [searchQuery, setSearchQuery] = useState("");
@@ -490,6 +500,8 @@ export const Inventory: React.FC = () => {
 
   const handleCloseTransferSocialMediaModal = () => {
     setIsTransferSocialMediaModalOpen(false);
+    setSellingGuidePrompt(DEFAULT_SELLING_GUIDE_PROMPT);
+    setBuyingGuidePrompt(DEFAULT_BUYING_GUIDE_PROMPT);
   };
 
   const handleTransfer = async () => {
@@ -575,7 +587,7 @@ export const Inventory: React.FC = () => {
       if (response.success) {
         toast.success(
           response.message ||
-            "Inventory transferred to storefront successfully",
+          "Inventory transferred to storefront successfully",
         );
         setSelectedProductIds([]);
         handleCloseTransferStorefrontModal();
@@ -614,12 +626,14 @@ export const Inventory: React.FC = () => {
 
       const response = await transferInventoryToSocialMedia({
         inventoryIds,
+        sellingGuidePrompt,
+        buyingGuidePrompt,
       });
 
       if (response.success) {
         toast.success(
           response.message ||
-            "Inventory transferred to social media successfully",
+          "Inventory transferred to social media successfully",
         );
         setSelectedProductIds([]);
         handleCloseTransferSocialMediaModal();
@@ -781,9 +795,9 @@ export const Inventory: React.FC = () => {
             {products.length === 0
               ? t("inventory.noProductsFound")
               : t("inventory.noProductsInCategory").replace(
-                  "{category}",
-                  selectedCategory,
-                )}
+                "{category}",
+                selectedCategory,
+              )}
           </p>
         </div>
       ) : (
@@ -1042,6 +1056,32 @@ export const Inventory: React.FC = () => {
                     .map((p) => p.name)
                     .join(", ")}
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Selling Guide Prompt
+                </label>
+                <textarea
+                  className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-none"
+                  rows={2}
+                  value={sellingGuidePrompt}
+                  onChange={(e) => setSellingGuidePrompt(e.target.value)}
+                  disabled={isTransferringToSocialMedia}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Buying Guide Prompt
+                </label>
+                <textarea
+                  className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-none"
+                  rows={2}
+                  value={buyingGuidePrompt}
+                  onChange={(e) => setBuyingGuidePrompt(e.target.value)}
+                  disabled={isTransferringToSocialMedia}
+                />
               </div>
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">

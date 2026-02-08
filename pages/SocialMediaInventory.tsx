@@ -16,6 +16,11 @@ import {
   fetchSocialMediaInventory,
   SocialMediaInventoryItem,
 } from "../services/SocialMedia/fetchSocialMediaInventory";
+import {
+  fetchSocialMediaInventoryDetail,
+  SocialMediaInventoryDetail,
+} from "../services/SocialMedia/fetchSocialMediaInventoryDetail";
+import { SocialMediaInventoryDetailModal } from "../components/SocialMedia/SocialMediaInventoryDetailModal";
 
 export const SocialMediaInventory: React.FC = () => {
   const navigate = useNavigate();
@@ -25,6 +30,10 @@ export const SocialMediaInventory: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedItem, setSelectedItem] =
+    useState<SocialMediaInventoryDetail | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
 
   useEffect(() => {
     loadSocialMediaInventory();
@@ -46,6 +55,31 @@ export const SocialMediaInventory: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleViewDetail = async (id: string) => {
+    setIsDetailModalOpen(true);
+    setDetailLoading(true);
+    try {
+      const response = await fetchSocialMediaInventoryDetail(id);
+      if (response.success) {
+        setSelectedItem(response.data);
+      } else {
+        toast.error("Failed to load item details");
+        // setIsDetailModalOpen(false); // Keep open to show empty state or error if desired, but better to close or show error in modal
+      }
+    } catch (error) {
+      console.error("Error fetching details:", error);
+      toast.error("Failed to load item details");
+      // setIsDetailModalOpen(false);
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  const handleCloseDetailModal = () => {
+    setIsDetailModalOpen(false);
+    setSelectedItem(null);
   };
 
   console.log(inventoryItems);
@@ -216,6 +250,9 @@ export const SocialMediaInventory: React.FC = () => {
                 <th className="px-4 py-3 font-medium text-slate-600">
                   AI Guides
                 </th>
+                <th className="px-4 py-3 font-medium text-slate-600 text-right">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -265,12 +302,27 @@ export const SocialMediaInventory: React.FC = () => {
                       </button>
                     </div>
                   </td>
+                  <td className="px-4 py-3 text-right">
+                    <button
+                      onClick={() => handleViewDetail(item.id)}
+                      className="px-3 py-1 text-xs font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700 transition"
+                    >
+                      Detail
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         )}
       </div>
+
+      <SocialMediaInventoryDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={handleCloseDetailModal}
+        inventoryItem={selectedItem}
+        loading={detailLoading}
+      />
     </div>
   );
 };

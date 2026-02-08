@@ -2,6 +2,8 @@ import axios from "../axios";
 
 export interface TransferInventoryToSocialMediaPayload {
   inventoryIds: string[];
+  sellingGuidePrompt?: string;
+  buyingGuidePrompt?: string;
 }
 
 interface TransferInventoryToSocialMediaResponse {
