@@ -12,7 +12,7 @@ export default function FacebookLogin() {
 
       // Redirect to Facebook login in same window
       window.location.href =
-        "https://facebook-oauth-01dy.onrender.com/api/v1/auth/facebook";
+        "https://overearnest-intentional-rosendo.ngrok-free.dev/api/v1/auth/facebook";
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
       setLoading(false);
