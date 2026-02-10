@@ -26,6 +26,7 @@ import { Login } from "./pages/Login";
 import { AIPersonalityPage } from "./pages/AIPersonality";
 import { SocialMediaInventory } from "./pages/SocialMediaInventory";
 import { SocialMediaOrderCreate } from "./pages/SocialMediaOrderCreate";
+import FacebookLogin from "./pages/FacebookLogin";
 import PrintReceipt from "./pages/PrintReceipt";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -73,17 +74,17 @@ const AppLayout: React.FC = () => {
           <Route
             path="/"
             element={
-              <ProtectedRoute>
-                <Navigate to="/pos" replace />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <Navigate to="/pos" replace />
+              // </ProtectedRoute>
             }
           />
           <Route
             path="/pos"
             element={
-              <ProtectedRoute>
-                <POS />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <POS />
+              // </ProtectedRoute>
             }
           />
           <Route
@@ -97,131 +98,132 @@ const AppLayout: React.FC = () => {
           <Route
             path="/warehouse"
             element={
-              <ProtectedRoute>
-                <Warehouse />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <Warehouse />
+              // </ProtectedRoute>
             }
           />
           <Route
             path="/warehouse/:id"
             element={
-              <ProtectedRoute>
-                <WarehouseDetail />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <WarehouseDetail />
+              // </ProtectedRoute>
             }
           />
           <Route
             path="/storefront"
             element={
-              <ProtectedRoute>
-                <Storefront />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <Storefront />
+              // </ProtectedRoute>
             }
           />
           <Route
             path="/storefront/:id"
             element={
-              <ProtectedRoute>
-                <StorefrontDetail />
-              </ProtectedRoute>
+              // <ProtectedRo>
+              <StorefrontDetail />
+              // </ProtectedRo      ute>
             }
           />
           <Route
             path="/social-media-inventory"
             element={
-              <ProtectedRoute>
-                <SocialMediaInventory />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <SocialMediaInventory />
+              // </ProtectedRoute>
             }
           />
           <Route path="/order" element={<SocialMediaOrderCreate />} />
+          <Route path="/facebook-login" element={<FacebookLogin />} />
           <Route path="/print-receipt/:orderId" element={<PrintReceipt />} />
           <Route
             path="/suppliers"
             element={
-              <ProtectedRoute>
-                <Suppliers />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <Suppliers />
+              // </ProtectedRoute>
             }
           />
           <Route
             path="/purchasing"
             element={
-              <ProtectedRoute>
-                <Purchasing />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <Purchasing />
+              // </ProtectedRoute>
             }
           />
           <Route
             path="/orders"
             element={
-              <ProtectedRoute>
-                <Orders />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <Orders />
+              // </ProtectedRoute>
             }
           />
           <Route
             path="/credit-orders"
             element={
-              <ProtectedRoute>
-                <CreditOrders />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <CreditOrders />
+              // </ProtectedRoute>
             }
           />
           <Route
             path="/credits"
             element={
-              <ProtectedRoute>
-                <Credits />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <Credits />
+              // </ProtectedRoute>
             }
           />
           <Route
             path="/credits/:id"
             element={
-              <ProtectedRoute>
-                <CreditDetail />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <CreditDetail />
+              // </ProtectedRoute>
             }
           />
           <Route
             path="/expenses"
             element={
-              <ProtectedRoute>
-                <Expenses />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <Expenses />
+              // </ProtectedRoute>
             }
           />
           <Route
             path="/reports"
             element={
-              <ProtectedRoute>
-                <Reports />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <Reports />
+              // </ProtectedRoute>
             }
           />
           <Route
             path="/settings"
             element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <Settings />
+              // </ProtectedRoute>
             }
           />
           <Route
             path="/accounts"
             element={
-              <ProtectedRoute>
-                <AccountManagement />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <AccountManagement />
+              // </ProtectedRoute>
             }
           />
           <Route
             path="/ai-personality"
             element={
-              <ProtectedRoute>
-                <AIPersonalityPage />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <AIPersonalityPage />
+              // </ProtectedRoute>
             }
           />
           <Route path="*" element={<Navigate to="/login" replace />} />

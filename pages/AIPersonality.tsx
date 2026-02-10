@@ -630,7 +630,7 @@ export const AIPersonalityPage: React.FC = () => {
       )}
 
       {/* Token Usage Tab */}
-      {activeTab === "token-usage" && (
+      {/* {activeTab === "token-usage" && (
         <div>
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-lg font-semibold text-slate-800">
@@ -667,7 +667,6 @@ export const AIPersonalityPage: React.FC = () => {
             </div>
           ) : (
             <div className="space-y-6">
-              {/* Statistics Cards */}
               {tokenUsageStats && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="bg-white rounded-xl shadow-sm border p-6">
@@ -729,7 +728,6 @@ export const AIPersonalityPage: React.FC = () => {
                 </div>
               )}
 
-              {/* Token Usage Table */}
               <div className="bg-white rounded-xl shadow-sm border">
                 <div className="p-6 border-b">
                   <h3 className="text-lg font-semibold text-slate-800">
@@ -790,7 +788,7 @@ export const AIPersonalityPage: React.FC = () => {
             </div>
           )}
         </div>
-      )}
+      )} */}
 
       <PersonalityModal
         isOpen={isModalOpen}

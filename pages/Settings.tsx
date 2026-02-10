@@ -39,6 +39,7 @@ export const Settings: React.FC = () => {
     setLoading(true);
     try {
       const response = await fetchStockAuditLogs();
+      console.log(response);
       if (response.success && response.data) {
         setStockAuditLogs(response.data);
       } else {
@@ -255,7 +256,7 @@ export const Settings: React.FC = () => {
       )}
 
       {/* Transfer Management Tab */}
-      {activeTab === "transfer" && (
+      {/* {activeTab === "transfer" && (
         <div className="bg-white p-6 rounded-xl shadow-sm border">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold flex items-center">
@@ -276,14 +277,14 @@ export const Settings: React.FC = () => {
             onStatusChange={loadTransfers}
           />
         </div>
-      )}
+      )} */}
 
       {/* Transfer Detail Modal */}
-      <TransferDetailModal
+      {/* <TransferDetailModal
         isOpen={isTransferDetailModalOpen}
         onClose={() => setIsTransferDetailModalOpen(false)}
         transferId={selectedTransferId}
-      />
+      /> */}
     </div>
   );
 };
