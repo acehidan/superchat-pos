@@ -5,6 +5,11 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 axios.defaults.baseURL = BASE_URL;
 
+// Add ngrok-skip-browser-warning header for all API requests
+axios.defaults.headers.common = {
+  "ngrok-skip-browser-warning": "69420", // Any value works
+};
+
 // Get token from localStorage
 const getToken = () => {
   return localStorage.getItem("authToken");
@@ -40,7 +45,7 @@ axios.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Response interceptor to handle token expiration
@@ -58,7 +63,7 @@ axios.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default axios;
