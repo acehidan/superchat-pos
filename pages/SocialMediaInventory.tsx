@@ -10,12 +10,19 @@ import {
   X,
   MessageSquare,
   Bot,
+  TrendingUp,
+  TrendingDown,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
   fetchSocialMediaInventory,
   SocialMediaInventoryItem,
 } from "../services/SocialMedia/fetchSocialMediaInventory";
+import {
+  updateSocialMediaInventoryQuantity,
+  UpdateSocialMediaInventoryQuantityPayload,
+} from "../services/SocialMedia/updateSocialMediaInventoryQuantity";
 
 export const SocialMediaInventory: React.FC = () => {
   const navigate = useNavigate();
@@ -25,6 +32,17 @@ export const SocialMediaInventory: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+
+  // Stock Adjustment Modal State
+  const [isAdjustmentModalOpen, setIsAdjustmentModalOpen] = useState(false);
+  const [selectedStockItem, setSelectedStockItem] =
+    useState<SocialMediaInventoryItem | null>(null);
+  const [adjustmentType, setAdjustmentType] = useState<"increase" | "decrease">(
+    "increase",
+  );
+  const [adjustmentQuantity, setAdjustmentQuantity] = useState(0);
+  const [adjustmentReason, setAdjustmentReason] = useState("");
+  const [isAdjusting, setIsAdjusting] = useState(false);
 
   useEffect(() => {
     loadSocialMediaInventory();
@@ -73,6 +91,75 @@ export const SocialMediaInventory: React.FC = () => {
       item.inventoryId.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // Stock Adjustment Functions
+  const openAdjustmentModal = (
+    item: SocialMediaInventoryItem,
+    type: "increase" | "decrease",
+  ) => {
+    setSelectedStockItem(item);
+    setAdjustmentType(type);
+    setAdjustmentQuantity(0);
+    setAdjustmentReason("");
+    setIsAdjustmentModalOpen(true);
+  };
+
+  const handleSubmitAdjustment = async () => {
+    if (!selectedStockItem) return;
+
+    if (adjustmentQuantity <= 0) {
+      toast.error("Quantity must be greater than 0");
+      return;
+    }
+
+    // For decrease, check if quantity is available
+    if (
+      adjustmentType === "decrease" &&
+      adjustmentQuantity > selectedStockItem.quantity
+    ) {
+      toast.error(
+        `Cannot decrease by ${adjustmentQuantity}. Available quantity is ${selectedStockItem.quantity}`,
+      );
+      return;
+    }
+
+    setIsAdjusting(true);
+    try {
+      const quantityChange =
+        adjustmentType === "increase"
+          ? adjustmentQuantity
+          : -adjustmentQuantity;
+
+      const payload: UpdateSocialMediaInventoryQuantityPayload = {
+        quantityChange,
+        reason: adjustmentReason.trim() || "",
+      };
+
+      const result = await updateSocialMediaInventoryQuantity(
+        selectedStockItem.id,
+        payload,
+      );
+
+      if (result.success) {
+        toast.success(
+          `Stock ${
+            adjustmentType === "increase" ? "increased" : "decreased"
+          } successfully!`,
+        );
+        setIsAdjustmentModalOpen(false);
+        setSelectedStockItem(null);
+        setAdjustmentQuantity(0);
+        setAdjustmentReason("");
+        loadSocialMediaInventory(); // Refresh stock
+      } else {
+        toast.error(result.message || "Failed to update stock quantity");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update stock quantity");
+    } finally {
+      setIsAdjusting(false);
+    }
+  };
 
   return (
     <div className="p-6">
@@ -216,6 +303,9 @@ export const SocialMediaInventory: React.FC = () => {
                 <th className="px-4 py-3 font-medium text-slate-600">
                   AI Guides
                 </th>
+                <th className="px-4 py-3 font-medium text-slate-600">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -265,12 +355,197 @@ export const SocialMediaInventory: React.FC = () => {
                       </button>
                     </div>
                   </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => openAdjustmentModal(item, "increase")}
+                        className="text-xs bg-green-50 text-green-600 px-3 py-1.5 rounded hover:bg-green-100 border border-green-200 font-medium transition-colors flex items-center gap-1"
+                        title="Increase Stock"
+                      >
+                        <TrendingUp className="w-3 h-3" /> +
+                      </button>
+                      <button
+                        onClick={() => openAdjustmentModal(item, "decrease")}
+                        disabled={item.quantity === 0}
+                        className="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded hover:bg-red-100 border border-red-200 font-medium transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Decrease Stock"
+                      >
+                        <TrendingDown className="w-3 h-3" /> -
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         )}
       </div>
+
+      {/* Stock Adjustment Modal */}
+      {isAdjustmentModalOpen && selectedStockItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+            <div className="p-6 border-b flex justify-between items-center">
+              <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                {adjustmentType === "increase" ? (
+                  <TrendingUp className="w-5 h-5 text-green-600" />
+                ) : (
+                  <TrendingDown className="w-5 h-5 text-red-600" />
+                )}
+                {adjustmentType === "increase"
+                  ? "Increase Stock"
+                  : "Decrease Stock"}
+              </h2>
+              <button
+                onClick={() => setIsAdjustmentModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 p-1"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {/* Product Info */}
+              <div className="bg-slate-50 p-4 rounded-lg">
+                <p className="text-sm text-slate-500 mb-1">Product</p>
+                <p className="font-bold text-slate-800">
+                  {selectedStockItem.inventoryId.productName}
+                </p>
+                <p className="text-xs text-slate-500 mt-1">
+                  {selectedStockItem.inventoryId.productCode} | Current:{" "}
+                  {selectedStockItem.quantity}
+                </p>
+              </div>
+
+              {/* Adjustment Type */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Adjustment Type
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <label
+                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
+                      adjustmentType === "increase"
+                        ? "border-green-500 bg-green-50"
+                        : "border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="adjustmentType"
+                      value="increase"
+                      checked={adjustmentType === "increase"}
+                      onChange={(e) =>
+                        setAdjustmentType(
+                          e.target.value as "increase" | "decrease",
+                        )
+                      }
+                      className="sr-only"
+                    />
+                    <TrendingUp className="w-4 h-4 text-green-600 mr-2" />
+                    <span className="font-medium">Increase</span>
+                  </label>
+                  <label
+                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
+                      adjustmentType === "decrease"
+                        ? "border-red-500 bg-red-50"
+                        : "border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="adjustmentType"
+                      value="decrease"
+                      checked={adjustmentType === "decrease"}
+                      onChange={(e) =>
+                        setAdjustmentType(
+                          e.target.value as "increase" | "decrease",
+                        )
+                      }
+                      className="sr-only"
+                    />
+                    <TrendingDown className="w-4 h-4 text-red-600 mr-2" />
+                    <span className="font-medium">Decrease</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Quantity */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Quantity <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max={
+                    adjustmentType === "decrease"
+                      ? selectedStockItem.quantity
+                      : undefined
+                  }
+                  value={adjustmentQuantity}
+                  onChange={(e) =>
+                    setAdjustmentQuantity(Number(e.target.value))
+                  }
+                  className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-purple-500 outline-none"
+                  placeholder={`Enter quantity to ${adjustmentType}`}
+                />
+                {adjustmentType === "decrease" && (
+                  <p className="text-xs text-slate-500 mt-1">
+                    Maximum: {selectedStockItem.quantity}
+                  </p>
+                )}
+              </div>
+
+              {/* Reason */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Reason (optional)
+                </label>
+                <textarea
+                  rows={3}
+                  value={adjustmentReason}
+                  onChange={(e) => setAdjustmentReason(e.target.value)}
+                  className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-purple-500 outline-none resize-none"
+                  placeholder="Enter reason for stock adjustment..."
+                />
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-end gap-3 pt-4 border-t">
+                <button
+                  type="button"
+                  onClick={() => setIsAdjustmentModalOpen(false)}
+                  className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmitAdjustment}
+                  disabled={isAdjusting || adjustmentQuantity <= 0}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                >
+                  {isAdjusting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" /> Updating...
+                    </>
+                  ) : (
+                    <>
+                      {adjustmentType === "increase" ? (
+                        <TrendingUp className="w-4 h-4" />
+                      ) : (
+                        <TrendingDown className="w-4 h-4" />
+                      )}
+                      {adjustmentType === "increase" ? "Increase" : "Decrease"}{" "}
+                      Stock
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
