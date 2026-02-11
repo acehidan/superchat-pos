@@ -38,8 +38,8 @@ export const SocialMediaInventory: React.FC = () => {
         "Social Media Inventory",
         response.socialMediaSaleInventories,
       );
-      if (response.socialMediaSaleInventories) {
-        setInventoryItems(response.socialMediaSaleInventories);
+      if (response.success) {
+        setInventoryItems(response.data);
       }
     } catch (error) {
       toast.error("Failed to load social media inventory");
