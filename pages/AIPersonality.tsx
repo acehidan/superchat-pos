@@ -11,6 +11,7 @@ import {
   Brain,
   BarChart3,
   RefreshCw,
+  FileText,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AIPersonality } from "../services/AI/fetchAIPersonalities";
@@ -34,6 +35,10 @@ import {
   TokenUsageResponse,
   fetchTokenUsage,
 } from "../services/AI/fetchTokenUsage";
+import {
+  PersonalityMarkdown,
+  fetchPersonalityMarkdown,
+} from "../services/AI/fetchPersonalityMarkdown";
 
 export const AIPersonalityPage: React.FC = () => {
   const [personalities, setPersonalities] = useState<AIPersonality[]>([]);
@@ -57,8 +62,13 @@ export const AIPersonalityPage: React.FC = () => {
 
   // Tab State
   const [activeTab, setActiveTab] = useState<
-    "personality" | "intent" | "token-usage"
+    "personality" | "intent" | "token-usage" | "markdown"
   >("personality");
+
+  // Personality Markdown State
+  const [personalityMarkdown, setPersonalityMarkdown] =
+    useState<PersonalityMarkdown | null>(null);
+  const [loadingMarkdown, setLoadingMarkdown] = useState(false);
 
   // Token Usage State
   const [tokenUsage, setTokenUsage] = useState<TokenUsage[]>([]);
@@ -82,7 +92,25 @@ export const AIPersonalityPage: React.FC = () => {
     loadPersonalities();
     loadIntents();
     loadTokenUsage();
+    loadPersonalityMarkdown();
   }, []);
+
+  const loadPersonalityMarkdown = async () => {
+    setLoadingMarkdown(true);
+    try {
+      const response = await fetchPersonalityMarkdown();
+      if (response.success && response.data) {
+        setPersonalityMarkdown(response.data);
+      } else {
+        toast.error(response.message || "Failed to load personality markdown");
+      }
+    } catch (error) {
+      console.error("Error loading personality markdown:", error);
+      toast.error("Failed to load personality markdown");
+    } finally {
+      setLoadingMarkdown(false);
+    }
+  };
 
   const loadTokenUsage = async () => {
     setLoadingTokenUsage(true);
@@ -363,6 +391,19 @@ export const AIPersonalityPage: React.FC = () => {
             <div className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
               Token Usage
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveTab("markdown")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+              activeTab === "markdown"
+                ? "border-primary text-primary"
+                : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Personality Markdown
             </div>
           </button>
         </nav>
@@ -789,6 +830,142 @@ export const AIPersonalityPage: React.FC = () => {
           )}
         </div>
       )} */}
+
+      {/* Personality Markdown Tab */}
+      {activeTab === "markdown" && (
+        <div>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-lg font-semibold text-slate-800">
+              Personality Markdown
+            </h2>
+            <button
+              onClick={loadPersonalityMarkdown}
+              disabled={loadingMarkdown}
+              className="bg-btn-primary hover:bg-btn-primary-hover text-dark px-4 py-2 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50"
+            >
+              {loadingMarkdown ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Refreshing...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-4 h-4" />
+                  Refresh
+                </>
+              )}
+            </button>
+          </div>
+
+          {loadingMarkdown ? (
+            <div className="bg-white rounded-xl shadow-sm border p-8 text-center">
+              <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-2" />
+              <p className="text-slate-500">Loading personality markdown...</p>
+            </div>
+          ) : !personalityMarkdown ? (
+            <div className="bg-white rounded-xl shadow-sm border p-8 text-center">
+              <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-500 mb-4">
+                No personality markdown found
+              </p>
+              <button
+                onClick={loadPersonalityMarkdown}
+                className="bg-btn-primary hover:bg-btn-primary-hover text-dark px-4 py-2 rounded-lg flex items-center gap-2 mx-auto transition-colors"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Load Markdown
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Personality Info Card */}
+              <div className="bg-white rounded-xl shadow-sm border">
+                <div className="p-6 border-b">
+                  <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                    <Bot className="w-5 h-5 text-primary" />
+                    {personalityMarkdown.personality.name}
+                  </h3>
+                  <div className="flex items-center gap-3 mt-2">
+                    <span className="text-sm px-3 py-1 bg-primary/20 text-primary-700 rounded-full font-medium">
+                      {personalityMarkdown.personality.personalityType}
+                    </span>
+                    <span className="text-sm px-3 py-1 bg-slate-100 text-slate-600 rounded-full">
+                      {personalityMarkdown.personality.gender}
+                    </span>
+                    <span
+                      className={`text-sm px-3 py-1 rounded-full font-medium ${
+                        personalityMarkdown.personality.isActive
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      {personalityMarkdown.personality.isActive
+                        ? "Active"
+                        : "Inactive"}
+                    </span>
+                    {personalityMarkdown.cached && (
+                      <span className="text-sm px-3 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">
+                        Cached
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="p-6">
+                  <p className="text-sm text-slate-600 mb-4">
+                    {personalityMarkdown.personality.personalityDescription}
+                  </p>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-slate-500">Created:</span>
+                      <span className="ml-2 text-slate-700">
+                        {new Date(
+                          personalityMarkdown.personality.createdAt,
+                        ).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500">Updated:</span>
+                      <span className="ml-2 text-slate-700">
+                        {new Date(
+                          personalityMarkdown.personality.updatedAt,
+                        ).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Markdown Content */}
+              <div className="bg-white rounded-xl shadow-sm border">
+                <div className="p-6 border-b flex justify-between items-center">
+                  <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-primary" />
+                    Markdown Content
+                  </h3>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        personalityMarkdown.markdown,
+                      );
+                      toast.success("Markdown copied to clipboard");
+                    }}
+                    className="text-sm px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors"
+                  >
+                    Copy to Clipboard
+                  </button>
+                </div>
+                <div className="p-6">
+                  <div className="bg-slate-50 rounded-lg p-6 overflow-x-auto">
+                    <pre className="text-sm text-slate-700 whitespace-pre-wrap font-mono leading-relaxed">
+                      {personalityMarkdown.markdown}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <PersonalityModal
         isOpen={isModalOpen}
