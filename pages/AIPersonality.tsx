@@ -76,6 +76,8 @@ export const AIPersonalityPage: React.FC = () => {
   const [tokenUsageStats, setTokenUsageStats] = useState<
     TokenUsageResponse["statistics"] | null
   >(null);
+  const [showInactivePersonalities, setShowInactivePersonalities] =
+    useState(false);
 
   // Confirmation Modal State
   const [confirmModal, setConfirmModal] = useState<{
@@ -342,6 +344,11 @@ export const AIPersonalityPage: React.FC = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
+  const countWords = (text: string): number => {
+    if (!text) return 0;
+    return text.length;
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -454,6 +461,13 @@ export const AIPersonalityPage: React.FC = () => {
                         <h4 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
                           <Target className="w-5 h-5 text-primary" />
                           Description
+                          <span className="text-sm font-normal text-slate-500">
+                            (
+                            {countWords(
+                              activePersonality.personalityDescription,
+                            )}{" "}
+                            characters)
+                          </span>
                         </h4>
                         <div className="bg-slate-50 rounded-lg p-6">
                           <p className="text-slate-700 leading-relaxed text-base">
@@ -467,6 +481,9 @@ export const AIPersonalityPage: React.FC = () => {
                         <h4 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
                           <Brain className="w-5 h-5 text-primary" />
                           Behavioral Rules
+                          <span className="text-sm font-normal text-slate-500">
+                            ({countWords(activePersonality.rules)} characters)
+                          </span>
                         </h4>
                         <div className="bg-slate-50 rounded-lg p-6">
                           <div className="prose prose-slate max-w-none">
@@ -578,28 +595,13 @@ export const AIPersonalityPage: React.FC = () => {
             </div>
           )}
 
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-semibold text-slate-800">
-              AI Personalities
-            </h2>
-            <button
-              onClick={handleOpenCreate}
-              className="bg-btn-primary hover:bg-btn-primary-hover text-dark px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Create Personality
-            </button>
-          </div>
-
-          {loading ? (
-            <div className="bg-white rounded-xl shadow-sm border p-8 text-center">
-              <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-2" />
-              <p className="text-slate-500">Loading AI personalities...</p>
-            </div>
-          ) : personalities.length === 0 ? (
+          {/* No Active Personality Message */}
+          {personalities.filter((p) => p.isActive).length === 0 && (
             <div className="bg-white rounded-xl shadow-sm border p-8 text-center">
               <Bot className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <p className="text-slate-500 mb-4">No AI personalities found</p>
+              <p className="text-slate-500 mb-4">
+                No active AI personality found
+              </p>
               <button
                 onClick={handleOpenCreate}
                 className="bg-btn-primary hover:bg-btn-primary-hover text-dark px-4 py-2 rounded-lg flex items-center gap-2 mx-auto transition-colors"
@@ -608,94 +610,131 @@ export const AIPersonalityPage: React.FC = () => {
                 Create Your First Personality
               </button>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {personalities.map((personality) => (
-                <div
-                  key={personality.id}
-                  className="bg-white rounded-xl shadow-sm border hover:shadow-md transition-shadow"
-                >
-                  <div className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-slate-800 mb-1">
-                          {personality.name}
-                        </h3>
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-xs px-2 py-1 bg-primary/20 text-primary-700 rounded-full font-medium">
-                            {personality.personalityType}
-                          </span>
-                          <span className="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded-full">
-                            {personality.gender}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => handleToggleActivation(personality)}
-                          disabled={togglingId === personality.id}
-                          className="p-1 hover:bg-slate-100 rounded transition-colors disabled:opacity-50"
-                          title={
-                            personality.isActive ? "Deactivate" : "Activate"
-                          }
-                        >
-                          {togglingId === personality.id ? (
-                            <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
-                          ) : personality.isActive ? (
-                            <ToggleRight className="w-5 h-5 text-green-500 hover:text-green-600" />
-                          ) : (
-                            <ToggleLeft className="w-5 h-5 text-slate-400 hover:text-slate-600" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
+          )}
 
-                    <div className="mb-4">
-                      <p className="text-sm text-slate-600 line-clamp-3">
-                        {personality.personalityDescription}
-                      </p>
-                    </div>
-
-                    <div className="mb-4">
-                      <p className="text-xs text-slate-500 font-medium mb-1">
-                        Rules:
-                      </p>
-                      <div className="text-xs text-slate-600 bg-slate-50 p-2 rounded max-h-20 overflow-y-auto">
-                        {personality.rules}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-4 border-t">
-                      <div className="text-xs text-slate-500">
-                        Created: {formatDate(personality.createdAt)}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleOpenEdit(personality)}
-                          className="p-1.5 text-slate-600 hover:text-primary hover:bg-primary/10 rounded transition-colors"
-                          title="Edit"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(personality)}
-                          disabled={deletingId === personality.id}
-                          className="p-1.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
-                          title="Delete"
-                        >
-                          {deletingId === personality.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="w-4 h-4" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+          {/* Toggle Inactive Personalities Button */}
+          {personalities.filter((p) => !p.isActive).length > 0 && (
+            <div className="flex justify-center mb-6">
+              <button
+                onClick={() =>
+                  setShowInactivePersonalities(!showInactivePersonalities)
+                }
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors flex items-center gap-2"
+              >
+                {showInactivePersonalities ? (
+                  <>
+                    <ToggleLeft className="w-4 h-4" />
+                    Hide Inactive Personalities
+                  </>
+                ) : (
+                  <>
+                    <ToggleRight className="w-4 h-4" />
+                    Show Inactive Personalities (
+                    {personalities.filter((p) => !p.isActive).length})
+                  </>
+                )}
+              </button>
             </div>
           )}
+
+          {/* Inactive Personalities List */}
+          {showInactivePersonalities &&
+            personalities.filter((p) => !p.isActive).length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-lg font-semibold text-slate-800 mb-4">
+                  Inactive Personalities
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {personalities
+                    .filter((p) => !p.isActive)
+                    .map((personality) => (
+                      <div
+                        key={personality.id}
+                        className="bg-white rounded-xl shadow-sm border hover:shadow-md transition-shadow"
+                      >
+                        <div className="p-6">
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex-1">
+                              <h3 className="text-lg font-semibold text-slate-800 mb-1">
+                                {personality.name}
+                              </h3>
+                              <div className="flex items-center gap-2 mb-2">
+                                <span className="text-xs px-2 py-1 bg-primary/20 text-primary-700 rounded-full font-medium">
+                                  {personality.personalityType}
+                                </span>
+                                <span className="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded-full">
+                                  {personality.gender}
+                                </span>
+                                <span className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded-full font-medium">
+                                  Inactive
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() =>
+                                  handleToggleActivation(personality)
+                                }
+                                disabled={togglingId === personality.id}
+                                className="p-1 hover:bg-slate-100 rounded transition-colors disabled:opacity-50"
+                                title="Activate"
+                              >
+                                {togglingId === personality.id ? (
+                                  <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+                                ) : (
+                                  <ToggleLeft className="w-5 h-5 text-slate-400 hover:text-green-600" />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="mb-4">
+                            <p className="text-sm text-slate-600 line-clamp-3">
+                              {personality.personalityDescription}
+                            </p>
+                          </div>
+
+                          <div className="mb-4">
+                            <p className="text-xs text-slate-500 font-medium mb-1">
+                              Rules:
+                            </p>
+                            <div className="text-xs text-slate-600 bg-slate-50 p-2 rounded max-h-20 overflow-y-auto">
+                              {personality.rules}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-4 border-t">
+                            <div className="text-xs text-slate-500">
+                              Created: {formatDate(personality.createdAt)}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handleOpenEdit(personality)}
+                                className="p-1.5 text-slate-600 hover:text-primary hover:bg-primary/10 rounded transition-colors"
+                                title="Edit"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(personality)}
+                                disabled={deletingId === personality.id}
+                                className="p-1.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                                title="Delete"
+                              >
+                                {deletingId === personality.id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="w-4 h-4" />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
         </div>
       )}
 

@@ -2,6 +2,11 @@ import React, { useState, useEffect } from "react";
 import { X, Save, Loader2, Eye, EyeOff } from "lucide-react";
 import { AIPersonality } from "../../services/AI/fetchAIPersonalities";
 
+const countCharacters = (text: string): number => {
+  if (!text) return 0;
+  return text.length;
+};
+
 interface PersonalityModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -323,9 +328,14 @@ export const PersonalityModal: React.FC<PersonalityModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Personality Description <span className="text-red-500">*</span>
-            </label>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-sm font-medium text-slate-700">
+                Personality Description <span className="text-red-500">*</span>
+              </label>
+              <span className="text-xs text-slate-500">
+                {countCharacters(formData.personalityDescription)} characters
+              </span>
+            </div>
             <div className="bg-slate-50 rounded-lg p-4 border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
               <textarea
                 required
@@ -344,9 +354,14 @@ export const PersonalityModal: React.FC<PersonalityModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Rules <span className="text-red-500">*</span>
-            </label>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-sm font-medium text-slate-700">
+                Rules <span className="text-red-500">*</span>
+              </label>
+              <span className="text-xs text-slate-500">
+                {countCharacters(formData.rules)} characters
+              </span>
+            </div>
             <div className="bg-slate-50 rounded-lg p-4 border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
               <textarea
                 required
