@@ -93,7 +93,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   error,
   isLoading,
   products,
-  apiProducts,
+
   onClose,
   onSave,
   onFormDataChange,
@@ -461,25 +461,30 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           {/* Image Previews */}
           {imagePreviews.length > 0 && (
             <div className="mt-4 grid grid-cols-3 gap-3">
-              {imagePreviews.map((preview, index) => (
-                <div key={index} className="relative group">
-                  <img
-                    src={preview}
-                    alt={`Product image ${index + 1}`}
-                    className="w-full h-24 object-cover rounded-lg border"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(index)}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                  <div className="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded">
-                    {index === 0 ? "Primary" : `Image ${index + 1}`}
-                  </div>
-                </div>
-              ))}
+              {imagePreviews.map(
+                (preview, index) => (
+                  console.log("preview", preview),
+                  (
+                    <div key={index} className="relative group">
+                      <img
+                        src={preview}
+                        alt={`Product image ${index + 1}`}
+                        className="w-full h-24 object-cover rounded-lg border"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                      <div className="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded">
+                        {index === 0 ? "Primary" : `Image ${index + 1}`}
+                      </div>
+                    </div>
+                  )
+                ),
+              )}
             </div>
           )}
         </div>

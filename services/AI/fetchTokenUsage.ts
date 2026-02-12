@@ -11,10 +11,10 @@ export interface TokenUsage {
 }
 
 export interface TokenUsagePagination {
-  currentPage: number;
+  page: number;
+  limit: number;
+  total: number;
   totalPages: number;
-  totalItems: number;
-  itemsPerPage: number;
 }
 
 export interface TokenUsageStatistics {

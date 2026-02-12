@@ -412,6 +412,172 @@ export const AIPersonalityPage: React.FC = () => {
       {/* Personality Tab */}
       {activeTab === "personality" && (
         <div>
+          {/* Active Personality Full View */}
+          {personalities.filter((p) => p.isActive).length > 0 && (
+            <div className="mb-8">
+              <h2 className="text-lg font-semibold text-slate-800 mb-4">
+                Active Personality
+              </h2>
+              {personalities
+                .filter((p) => p.isActive)
+                .map((activePersonality) => (
+                  <div
+                    key={activePersonality.id}
+                    className="bg-white rounded-xl shadow-sm border mb-6"
+                  >
+                    <div className="p-8">
+                      {/* Header */}
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center">
+                          <Bot className="w-8 h-8 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-2xl font-bold text-slate-800 mb-2">
+                            {activePersonality.name}
+                          </h3>
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm px-4 py-2 bg-primary/20 text-primary-700 rounded-full font-medium">
+                              {activePersonality.personalityType}
+                            </span>
+                            <span className="text-sm px-4 py-2 bg-slate-100 text-slate-600 rounded-full">
+                              {activePersonality.gender}
+                            </span>
+                            <span className="text-sm px-4 py-2 bg-green-100 text-green-700 rounded-full font-medium">
+                              Active
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Description */}
+                      <div className="mb-8">
+                        <h4 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                          <Target className="w-5 h-5 text-primary" />
+                          Description
+                        </h4>
+                        <div className="bg-slate-50 rounded-lg p-6">
+                          <p className="text-slate-700 leading-relaxed text-base">
+                            {activePersonality.personalityDescription}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Rules */}
+                      <div>
+                        <h4 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                          <Brain className="w-5 h-5 text-primary" />
+                          Behavioral Rules
+                        </h4>
+                        <div className="bg-slate-50 rounded-lg p-6">
+                          <div className="prose prose-slate max-w-none">
+                            {activePersonality.rules
+                              .split("\n")
+                              .map((line, index) => {
+                                if (line.trim() === "") {
+                                  return <br key={index} />;
+                                }
+
+                                // Handle headers
+                                if (line.startsWith("#")) {
+                                  const level =
+                                    line.match(/^#+/)?.[0].length || 1;
+                                  const text = line.replace(/^#+\s*/, "");
+                                  const Tag = `h${Math.min(level + 3, 6)}` as
+                                    | "h4"
+                                    | "h5"
+                                    | "h6";
+                                  return React.createElement(
+                                    Tag,
+                                    {
+                                      key: index,
+                                      className:
+                                        "font-semibold text-slate-800 mt-4 mb-2",
+                                    },
+                                    text,
+                                  );
+                                }
+
+                                // Handle bold text
+                                if (
+                                  line.startsWith("**") &&
+                                  line.endsWith("**")
+                                ) {
+                                  const text = line.replace(/\*\*/g, "");
+                                  return (
+                                    <p
+                                      key={index}
+                                      className="font-semibold text-slate-700 mb-2"
+                                    >
+                                      {text}
+                                    </p>
+                                  );
+                                }
+
+                                // Handle bullet points
+                                if (line.startsWith("-")) {
+                                  const text = line.replace(/^-\s*/, "");
+                                  return (
+                                    <div
+                                      key={index}
+                                      className="flex items-start gap-3 mb-2"
+                                    >
+                                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                                      <p className="text-slate-700 flex-1">
+                                        {text}
+                                      </p>
+                                    </div>
+                                  );
+                                }
+
+                                // Regular text
+                                return (
+                                  <p
+                                    key={index}
+                                    className="text-slate-700 mb-2"
+                                  >
+                                    {line}
+                                  </p>
+                                );
+                              })}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex justify-end gap-3 pt-6 border-t">
+                        <button
+                          onClick={() => handleOpenEdit(activePersonality)}
+                          className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors flex items-center gap-2"
+                        >
+                          <Edit className="w-4 h-4" />
+                          Edit Personality
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleToggleActivation(activePersonality)
+                          }
+                          disabled={togglingId === activePersonality.id}
+                          className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
+                        >
+                          {togglingId === activePersonality.id ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              Updating...
+                            </>
+                          ) : (
+                            <>
+                              <ToggleLeft className="w-4 h-4" />
+                              Deactivate
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          )}
+
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-lg font-semibold text-slate-800">
               AI Personalities
@@ -671,7 +837,7 @@ export const AIPersonalityPage: React.FC = () => {
       )}
 
       {/* Token Usage Tab */}
-      {/* {activeTab === "token-usage" && (
+      {activeTab === "token-usage" && (
         <div>
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-lg font-semibold text-slate-800">
@@ -829,7 +995,7 @@ export const AIPersonalityPage: React.FC = () => {
             </div>
           )}
         </div>
-      )} */}
+      )}
 
       {/* Personality Markdown Tab */}
       {activeTab === "markdown" && (

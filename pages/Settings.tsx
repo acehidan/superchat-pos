@@ -192,10 +192,11 @@ export const Settings: React.FC = () => {
                           </td>
                           <td className="px-4 py-3">
                             <div className="font-medium text-slate-800">
-                              {log.locationId.locationName}
+                              {log?.locationId?.locationName}
                             </div>
                             <div className="text-xs text-slate-500">
-                              {log.locationId.locationCode} ({log.locationType})
+                              {log?.locationId?.locationCode} (
+                              {log?.locationType})
                             </div>
                           </td>
                           <td className="px-4 py-3">

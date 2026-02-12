@@ -129,13 +129,9 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                             className="relative group"
                           >
                             <img
-                              src={
-                                image.spaceKey
-                                  ? `https://your-api-base-url/${image.spaceKey}`
-                                  : "/placeholder-product.png"
-                              }
+                              src={image.url}
                               alt={`${product.productName} - Image ${index + 1}`}
-                              className="w-full h-32 object-cover rounded-lg border border-slate-200 hover:border-slate-300 transition-colors"
+                              className="w-full h-full object-cover rounded-lg border border-slate-200 hover:border-slate-300 transition-colors"
                               onError={(e) => {
                                 // Fallback if image doesn't load
                                 (e.target as HTMLImageElement).src =
