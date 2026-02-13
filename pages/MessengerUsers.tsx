@@ -221,11 +221,11 @@ export const MessengerUsersPage: React.FC = () => {
             </ol>
           </div>
           <a
-            href="/pos"
+            href="/facebook-login"
             className="inline-flex items-center gap-2 bg-btn-primary hover:bg-btn-primary-hover text-dark px-4 py-2 rounded-lg transition-colors"
           >
             <ExternalLink className="w-4 h-4" />
-            Go to POS Page for Authentication
+            Go to facebook login Page for Authentication
           </a>
         </div>
       ) : (
