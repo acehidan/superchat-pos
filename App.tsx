@@ -6,7 +6,8 @@ import { AppProvider } from "./context/AppContext";
 import { LanguageProvider } from "./context/LanguageContext";
 import { Sidebar } from "./components/Sidebar";
 import { LanguageSwitcher } from "./components/LanguageSwitcher";
-import { POS } from "./pages/POS";
+import POS from "./pages/POS";
+import FacebookSuccess from "./pages/FacebookSuccess";
 import { Warehouse } from "./pages/Warehouse";
 import { WarehouseDetail } from "./pages/WarehouseDetail";
 import { Storefront } from "./pages/Storefront";
@@ -24,6 +25,7 @@ import { CreditOrders } from "./pages/CreditOrders";
 import { AccountManagement } from "./pages/AccountManagement";
 import { Login } from "./pages/Login";
 import { AIPersonalityPage } from "./pages/AIPersonality";
+import { MessengerUsersPage } from "./pages/MessengerUsers";
 import { SocialMediaInventory } from "./pages/SocialMediaInventory";
 import { SocialMediaOrderCreate } from "./pages/SocialMediaOrderCreate";
 import FacebookLogin from "./pages/FacebookLogin";
@@ -37,36 +39,35 @@ const AppLayout: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       {/* Only show header and sidebar if authenticated */}
-      {token && (
-        <>
-          {/* Header */}
-          <header className="bg-dark border-b border-primary/20 sticky top-0 z-30 print:hidden shadow-lg">
-            <div className="flex items-center justify-between h-14 px-4">
-              <div className="flex items-center">
-                <button
-                  onClick={() => setSidebarOpen(true)}
-                  className="p-2 hover:bg-primary/10 rounded-lg transition-colors mr-3"
-                  aria-label="Open menu"
-                >
-                  <Menu className="w-6 h-6 text-white" />
-                </button>
-                {/* <img
+
+      <>
+        {/* Header */}
+        <header className="bg-dark border-b border-primary/20 sticky top-0 z-30 print:hidden shadow-lg">
+          <div className="flex items-center justify-between h-14 px-4">
+            <div className="flex items-center">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="p-2 hover:bg-primary/10 rounded-lg transition-colors mr-3"
+                aria-label="Open menu"
+              >
+                <Menu className="w-6 h-6 text-white" />
+              </button>
+              {/* <img
             src="/imaslogo.jpg"
             alt="IMAS Logo"
             className="w-10 h-10 object-contain rounded-lg mr-2 shadow-md"
           /> */}
-                <h1 className="text-lg font-bold text-white tracking-wide">
-                  Super Chat
-                </h1>
-              </div>
-              <LanguageSwitcher />
+              <h1 className="text-lg font-bold text-white tracking-wide">
+                Super Chat
+              </h1>
             </div>
-          </header>
+            <LanguageSwitcher />
+          </div>
+        </header>
 
-          {/* Sidebar */}
-          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        </>
-      )}
+        {/* Sidebar */}
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      </>
 
       {/* Main Content */}
       <main className="flex-1 overflow-x-hidden">
@@ -75,7 +76,7 @@ const AppLayout: React.FC = () => {
             path="/"
             element={
               // <ProtectedRoute>
-              <Navigate to="/pos" replace />
+              <Navigate to="/inventory" replace />
               // </ProtectedRoute>
             }
           />
@@ -137,6 +138,7 @@ const AppLayout: React.FC = () => {
           />
           <Route path="/order" element={<SocialMediaOrderCreate />} />
           <Route path="/facebook-login" element={<FacebookLogin />} />
+          <Route path="/success" element={<FacebookSuccess />} />
           <Route path="/print-receipt/:orderId" element={<PrintReceipt />} />
           <Route
             path="/suppliers"
@@ -223,6 +225,14 @@ const AppLayout: React.FC = () => {
             element={
               // <ProtectedRoute>
               <AIPersonalityPage />
+              // </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/messenger-users"
+            element={
+              // <ProtectedRoute>
+              <MessengerUsersPage />
               // </ProtectedRoute>
             }
           />

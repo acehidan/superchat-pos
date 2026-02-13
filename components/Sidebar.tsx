@@ -17,6 +17,7 @@ import {
   LogOut,
   Bot,
   Share2,
+  MessageCircle,
 } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { removeAuthToken } from "../services/axios";
@@ -55,7 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   };
 
   const menuItems = [
-    { path: "/pos", label: t("sidebar.checkout"), icon: ShoppingCart },
+    // { path: "/pos", label: t("sidebar.checkout"), icon: ShoppingCart },
     { path: "/inventory", label: t("sidebar.inventory"), icon: Package },
     { path: "/warehouse", label: t("sidebar.warehouse"), icon: Truck },
     { path: "/storefront", label: t("sidebar.storefront"), icon: Store },
@@ -64,19 +65,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       label: "Social Media Inventory",
       icon: Share2,
     },
-    {
-      path: "/social-media-order-create",
-      label: "Create Social Order",
-      icon: ShoppingCart,
-    },
+    // {
+    //   path: "/social-media-order-create",
+    //   label: "Create Social Order",
+    //   icon: ShoppingCart,
+    // },
     { path: "/suppliers", label: t("sidebar.suppliers"), icon: Users },
-    { path: "/purchasing", label: t("sidebar.purchasing"), icon: ShoppingBag },
-    { path: "/orders", label: t("sidebar.orders"), icon: Receipt },
-    { path: "/credit-orders", label: "Credit Orders", icon: CreditCard },
-    { path: "/credits", label: t("sidebar.creditSales"), icon: CreditCard },
-    { path: "/expenses", label: t("sidebar.expenses"), icon: PieChart },
-    { path: "/reports", label: t("sidebar.reports"), icon: LayoutDashboard },
+    // { path: "/purchasing", label: t("sidebar.purchasing"), icon: ShoppingBag },
+    // { path: "/orders", label: t("sidebar.orders"), icon: Receipt },
+    // { path: "/credit-orders", label: "Credit Orders", icon: CreditCard },
+    // { path: "/credits", label: t("sidebar.creditSales"), icon: CreditCard },
+    // { path: "/expenses", label: t("sidebar.expenses"), icon: PieChart },
+    // { path: "/reports", label: t("sidebar.reports"), icon: LayoutDashboard },
     { path: "/ai-personality", label: "AI Personality", icon: Bot },
+    { path: "/messenger-users", label: "Messenger Users", icon: MessageCircle },
     { path: "/accounts", label: t("sidebar.accountManagement"), icon: Shield },
   ];
 
