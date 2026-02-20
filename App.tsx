@@ -8,6 +8,7 @@ import { Sidebar } from "./components/Sidebar";
 import { LanguageSwitcher } from "./components/LanguageSwitcher";
 import POS from "./pages/POS";
 import FacebookSuccess from "./pages/FacebookSuccess";
+import SocialMediaOrders from "./pages/SocialMediaOrders";
 import { Warehouse } from "./pages/Warehouse";
 import { WarehouseDetail } from "./pages/WarehouseDetail";
 import { Storefront } from "./pages/Storefront";
@@ -137,6 +138,7 @@ const AppLayout: React.FC = () => {
             }
           />
           <Route path="/order" element={<SocialMediaOrderCreate />} />
+          <Route path="/social-media-orders" element={<SocialMediaOrders />} />
           <Route path="/facebook-login" element={<FacebookLogin />} />
           <Route path="/success" element={<FacebookSuccess />} />
           <Route path="/print-receipt/:orderId" element={<PrintReceipt />} />

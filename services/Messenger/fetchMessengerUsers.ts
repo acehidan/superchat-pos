@@ -1,25 +1,29 @@
-import axios from "../axios";
+import axios from "axios";
 import { getFacebookAuthHeader } from "../../utils/facebookAuth";
+
+// Create a separate axios instance for Facebook API calls
+const facebookAxios = axios.create();
 
 export interface MessengerUser {
   id: string;
   psid: string;
-  pageId: string;
-  isAutoResponseEnabled: boolean;
-  status: "active" | "inactive" | "blocked";
   firstName: string;
-  middleName: string;
   lastName: string;
   fullName: string;
-  gender: "male" | "female" | "other";
+  gender: string;
+  profilePicUrl?: string;
+  isAutoResponseEnabled: boolean;
+  status: string;
+  lastActiveAt?: string;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface MessengerUserPagination {
-  total: number;
-  limit: number;
-  offset: number;
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
 }
 
 export interface MessengerUserResponse {
@@ -29,16 +33,14 @@ export interface MessengerUserResponse {
   pagination: MessengerUserPagination;
 }
 
-export const fetchMessengerUsers = async (
-  limit: number = 10,
-  offset: number = 0,
-): Promise<MessengerUserResponse> => {
+export const fetchMessengerUsers = async (): Promise<MessengerUserResponse> => {
   try {
     // Get Facebook authentication headers
     const authHeaders = getFacebookAuthHeader();
+    console.log("authHeaders", authHeaders);
 
-    // Make request with authentication
-    const response = await axios.get(`messenger/users`, {
+    // Make request with authentication using separate axios instance
+    const response = await facebookAxios.get(`messenger/users`, {
       headers: {
         ...authHeaders,
       },
@@ -58,9 +60,10 @@ export const fetchMessengerUsers = async (
         error.response?.data?.message || "Failed to fetch messenger users",
       data: [],
       pagination: {
-        total: 0,
-        limit: 10,
-        offset: 0,
+        currentPage: 0,
+        totalPages: 0,
+        totalItems: 0,
+        itemsPerPage: 10,
       },
     };
   }

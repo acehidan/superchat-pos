@@ -49,21 +49,35 @@ axios.interceptors.request.use(
 );
 
 // Response interceptor to handle token expiration
-axios.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid
-      removeAuthToken();
-      // Redirect to login if not already there
-      if (window.location.pathname !== "/login") {
-        window.location.href = "/login";
-      }
-    }
-    return Promise.reject(error);
-  },
-);
+// axios.interceptors.response.use(
+//   (response) => {
+//     return response;
+//   },
+//   (error) => {
+//     if (error.response?.status === 401) {
+//       // Check if this is a Facebook authenticated route
+//       const currentPath = window.location.pathname;
+//       const isFacebookRoute =
+//         currentPath.includes("/messenger-users") ||
+//         currentPath.includes("/success") ||
+//         currentPath.includes("/facebook-login");
+
+//       if (isFacebookRoute) {
+//         // For Facebook routes, don't redirect to login
+//         // Let the component handle the authentication error
+//         console.warn("Facebook authentication failed on route:", currentPath);
+//         return Promise.reject(error);
+//       }
+
+//       // For regular app routes, remove token and redirect to login
+//       removeAuthToken();
+//       // Redirect to login if not already there
+//       if (window.location.pathname !== "/login") {
+//         window.location.href = "/login";
+//       }
+//     }
+//     return Promise.reject(error);
+//   },
+// );
 
 export default axios;

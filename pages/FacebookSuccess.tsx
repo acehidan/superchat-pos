@@ -195,6 +195,7 @@ export default function FacebookSuccess() {
                   <span className="text-gray-600">Status:</span>
                   <span className="text-green-600 font-medium">Connected</span>
                 </div>
+                <p className="text-xs text-gray-500 break-all">{`${tokenData.token}`}</p>
               </div>
             </div>
           )}

@@ -65,12 +65,12 @@ export const MessengerUsersPage: React.FC = () => {
   const loadUsers = async () => {
     setLoading(true);
     try {
-      const offset = (currentPage - 1) * limit;
-      const response = await fetchMessengerUsers(limit, offset);
+      const response = await fetchMessengerUsers();
+      console.log("response", response);
 
       if (response.success && response.data) {
         setUsers(response.data);
-        setTotalUsers(response.pagination.total);
+        setTotalUsers(response.pagination.totalItems);
       } else {
         toast.error(response.message || "Failed to load messenger users");
       }
@@ -84,9 +84,9 @@ export const MessengerUsersPage: React.FC = () => {
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
-      user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      // user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      // user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      // user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.psid.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus =
@@ -98,14 +98,6 @@ export const MessengerUsersPage: React.FC = () => {
   const totalPages = Math.ceil(totalUsers / limit);
   const startIndex = (currentPage - 1) * limit + 1;
   const endIndex = Math.min(currentPage * limit, totalUsers);
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
-  };
-
-  const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -138,20 +130,24 @@ export const MessengerUsersPage: React.FC = () => {
   };
 
   const handleRefresh = () => {
+    console.log("Refreshing users...");
     loadUsers();
   };
 
   const handleToggleAI = async (user: MessengerUser) => {
     setTogglingAI(user.psid);
     try {
-      const response = await toggleAIForUser(user.psid);
+      const response = await toggleAIForUser(
+        user.psid,
+        !user.isAutoResponseEnabled,
+      );
 
       if (response.success) {
         toast.success(
           `AI ${response.data?.status === "enabled" ? "enabled" : "disabled"} for ${user.fullName}`,
         );
 
-        // Update the user in the local state
+        // Update user in local state
         setUsers((prevUsers) =>
           prevUsers.map((u) =>
             u.psid === user.psid
@@ -182,7 +178,7 @@ export const MessengerUsersPage: React.FC = () => {
         </h1>
         <button
           onClick={handleRefresh}
-          disabled={loading || !isAuthenticated}
+          // disabled={loading || !isAuthenticated}
           className="bg-btn-primary hover:bg-btn-primary-hover text-dark px-4 py-2 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50"
         >
           {loading ? (
@@ -200,7 +196,7 @@ export const MessengerUsersPage: React.FC = () => {
       </div>
 
       {/* Authentication Status */}
-      {!isAuthenticated ? (
+      {isAuthenticated ? (
         <div className="bg-white rounded-xl shadow-sm border p-8 text-center mb-6">
           <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-slate-800 mb-2">

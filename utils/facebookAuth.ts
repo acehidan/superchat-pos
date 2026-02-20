@@ -2,6 +2,7 @@
 
 export interface FacebookAuthData {
   token: string | null;
+  pageId: string | null;
 }
 
 /**
@@ -10,9 +11,12 @@ export interface FacebookAuthData {
  */
 export const getFacebookAuthData = (): FacebookAuthData => {
   const token = localStorage.getItem("facebookToken");
-
+  const pageId = localStorage.getItem("facebookPageId");
+  console.log("token", token);
+  console.log("pageId", pageId);
   return {
     token,
+    pageId,
   };
 };
 
@@ -22,6 +26,7 @@ export const getFacebookAuthData = (): FacebookAuthData => {
  */
 export const isFacebookAuthenticated = (): boolean => {
   const { token } = getFacebookAuthData();
+  console.log("token", token);
   return !!token;
 };
 
