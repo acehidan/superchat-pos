@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Facebook, Loader } from "lucide-react";
+import axios from "./../services/axios";
 
 export default function FacebookLogin() {
   const [loading, setLoading] = useState(false);
@@ -11,8 +12,10 @@ export default function FacebookLogin() {
       setError(null);
 
       // Redirect to Facebook login in same window
-      window.location.href =
-        "https://overearnest-intentional-rosendo.ngrok-free.dev/api/v1/auth/facebook";
+      const response = await axios.get(
+        "https://overearnest-intentional-rosendo.ngrok-free.dev/api/v1/auth/facebook",
+      );
+      console.log(response);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
       setLoading(false);
