@@ -2,7 +2,6 @@
 
 export interface FacebookAuthData {
   token: string | null;
-  pageId: string | null;
 }
 
 /**
@@ -10,19 +9,18 @@ export interface FacebookAuthData {
  * @returns Facebook token and pageId
  */
 export const getFacebookAuthData = (): FacebookAuthData => {
-  const token = localStorage.getItem("facebookToken");
-  const pageId = localStorage.getItem("facebookPageId");
+  const token = localStorage.getItem("authToken");
+
   console.log("token", token);
-  console.log("pageId", pageId);
+
   return {
     token,
-    pageId,
   };
 };
 
 /**
  * Check if Facebook authentication is available
- * @returns true if both token and pageId are present
+ * @returns true if token is present
  */
 export const isFacebookAuthenticated = (): boolean => {
   const { token } = getFacebookAuthData();
@@ -34,7 +32,7 @@ export const isFacebookAuthenticated = (): boolean => {
  * Clear Facebook authentication data from localStorage
  */
 export const clearFacebookAuth = (): void => {
-  localStorage.removeItem("facebookToken");
+  localStorage.removeItem("authToken");
 };
 
 /**

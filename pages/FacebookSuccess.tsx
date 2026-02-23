@@ -76,8 +76,7 @@ export default function FacebookSuccess() {
         });
 
         // Store token in localStorage for future API calls
-        localStorage.setItem("facebookToken", token);
-        localStorage.setItem("facebookPageId", pageId || "");
+        localStorage.setItem("authToken", token);
 
         console.log("Token stored in localStorage");
 

@@ -1,5 +1,4 @@
 import axios from "axios";
-import { getFacebookAuthHeader } from "../../utils/facebookAuth";
 
 // Create a separate axios instance for Facebook API calls
 const facebookAxios = axios.create();
@@ -35,16 +34,8 @@ export interface MessengerUserResponse {
 
 export const fetchMessengerUsers = async (): Promise<MessengerUserResponse> => {
   try {
-    // Get Facebook authentication headers
-    const authHeaders = getFacebookAuthHeader();
-    console.log("authHeaders", authHeaders);
-
     // Make request with authentication using separate axios instance
-    const response = await facebookAxios.get(`messenger/users`, {
-      headers: {
-        ...authHeaders,
-      },
-    });
+    const response = await facebookAxios.get(`messenger/users`);
 
     return {
       success: true,

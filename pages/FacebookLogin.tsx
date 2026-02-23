@@ -13,9 +13,11 @@ export default function FacebookLogin() {
 
       // Redirect to Facebook login in same window
       const response = await axios.get(
-        "https://overearnest-intentional-rosendo.ngrok-free.dev/api/v1/auth/facebook",
+        "https://overearnest-intentional-rosendo.ngrok-free.dev/api/v1/auth/facebook?format=json",
       );
-      console.log(response);
+      const data = response.data;
+      console.log(data.data.oauthUrl);
+      window.location.href = data.data.oauthUrl;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
       setLoading(false);
