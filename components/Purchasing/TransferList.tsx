@@ -16,7 +16,7 @@ export const TransferList: React.FC<TransferListProps> = ({
   onStatusChange,
 }) => {
   const [transferFilter, setTransferFilter] = useState<"pending" | "completed">(
-    "completed"
+    "completed",
   );
   const [sourceTypeFilter, setSourceTypeFilter] = useState<
     "all" | "GRN" | "WAREHOUSE"
@@ -24,12 +24,12 @@ export const TransferList: React.FC<TransferListProps> = ({
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const handleMarkCompleted = async (transfer: TransferData) => {
-    setUpdatingId(transfer._id);
+    setUpdatingId(transfer.id);
     try {
-      const result = await updateTransferStatus(transfer._id, "completed");
+      const result = await updateTransferStatus(transfer.id, "completed");
       if (result.success) {
         toast.success(
-          `Transfer ${transfer.transferNumber} marked as completed`
+          `Transfer ${transfer.transferNumber} marked as completed`,
         );
         onStatusChange?.();
       } else {
@@ -142,7 +142,7 @@ export const TransferList: React.FC<TransferListProps> = ({
                 </tr>
               ) : (
                 filteredTransfers.map((transfer) => (
-                  <tr key={transfer._id} className="hover:bg-slate-50">
+                  <tr key={transfer.id} className="hover:bg-slate-50">
                     <td className="p-4 font-medium text-primary">
                       {transfer.transferNumber}
                     </td>
@@ -162,7 +162,7 @@ export const TransferList: React.FC<TransferListProps> = ({
                     <td className="p-4">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-bold ${getStatusColor(
-                          transfer.status
+                          transfer.status,
                         )}`}
                       >
                         {transfer.status.toUpperCase()}
@@ -182,10 +182,10 @@ export const TransferList: React.FC<TransferListProps> = ({
                         {transfer.status?.toLowerCase() === "pending" && (
                           <button
                             onClick={() => handleMarkCompleted(transfer)}
-                            disabled={updatingId === transfer._id}
+                            disabled={updatingId === transfer.id}
                             className="text-xs bg-green-50 text-status-success px-3 py-1.5 rounded hover:bg-green-100 border border-green-200 font-medium transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            {updatingId === transfer._id ? (
+                            {updatingId === transfer.id ? (
                               <>
                                 <Loader2 className="w-3 h-3 animate-spin" />{" "}
                                 Updating...

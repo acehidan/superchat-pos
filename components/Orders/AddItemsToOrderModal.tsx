@@ -11,9 +11,10 @@ import {
   AddItemToOrderRequest,
 } from "../../services/Order/addItemsToOrder";
 import { useLanguage } from "../../context/LanguageContext";
+import { log } from "console";
 
 interface InventoryProduct {
-  _id: string;
+  id: string;
   productName: string;
   productCode: string;
   sellingPrice: number;
@@ -162,7 +163,8 @@ export const AddItemsToOrderModal: React.FC<AddItemsToOrderModalProps> = ({
   }, [discountPercent, selectedItems, order]);
 
   const loadInventoryProducts = async () => {
-    if (!order || !order.storefrontId?._id) {
+    if (!order || !order.storefrontId?.id) {
+      console.log(order);
       toast.error(t("orders.noStorefrontSelected") || "No storefront selected");
       setInventoryProducts([]);
       return;
@@ -175,13 +177,13 @@ export const AddItemsToOrderModal: React.FC<AddItemsToOrderModalProps> = ({
         // Filter by order's storefront ID
         const storefrontStockItems = response.data.filter(
           (item: StorefrontStockItem) =>
-            item.storefrontId?._id === order.storefrontId._id,
+            item.storefrontId?.id === order.storefrontId.id,
         );
 
         // Map storefront stock items to InventoryProduct format
         const products = storefrontStockItems.map(
           (item: StorefrontStockItem) => ({
-            _id: item.inventoryId._id,
+            id: item.inventoryId.id,
             productName: item.inventoryId.productName || "",
             productCode: item.inventoryId.productCode || "",
             sellingPrice: item.inventoryId.sellingPrice || 0,
@@ -194,7 +196,7 @@ export const AddItemsToOrderModal: React.FC<AddItemsToOrderModalProps> = ({
         if (products.length === 0) {
           console.warn(
             `No products found for storefront: ${
-              order.storefrontId.storefrontName || order.storefrontId._id
+              order.storefrontId.storefrontName || order.storefrontId.id
             }`,
           );
         }
@@ -219,12 +221,12 @@ export const AddItemsToOrderModal: React.FC<AddItemsToOrderModalProps> = ({
 
   const handleAddItem = (product: InventoryProduct) => {
     const existingItem = selectedItems.find(
-      (item) => item.inventoryId === product._id,
+      (item) => item.inventoryId === product.id,
     );
     if (existingItem) {
       // Increase quantity if item already exists
       const updatedItems = selectedItems.map((item) =>
-        item.inventoryId === product._id
+        item.inventoryId === product.id
           ? {
               ...item,
               quantity: item.quantity + 1,
@@ -236,7 +238,7 @@ export const AddItemsToOrderModal: React.FC<AddItemsToOrderModalProps> = ({
     } else {
       // Add new item
       const newItem: SelectedItem = {
-        inventoryId: product._id,
+        inventoryId: product.id,
         productName: product.productName,
         productCode: product.productCode,
         quantity: 1,
@@ -359,7 +361,7 @@ export const AddItemsToOrderModal: React.FC<AddItemsToOrderModalProps> = ({
         paidAmount: totals.paidAmount,
       };
 
-      const response = await addItemsToOrder(order._id, payload);
+      const response = await addItemsToOrder(order.id, payload);
 
       if (response.success) {
         toast.success(
@@ -459,7 +461,7 @@ export const AddItemsToOrderModal: React.FC<AddItemsToOrderModalProps> = ({
                 <div className="grid grid-cols-1 gap-3">
                   {filteredProducts.map((product) => (
                     <button
-                      key={product._id}
+                      key={product.id}
                       onClick={() => handleAddItem(product)}
                       disabled={
                         product.availableQuantity !== undefined &&
@@ -528,7 +530,7 @@ export const AddItemsToOrderModal: React.FC<AddItemsToOrderModalProps> = ({
                     <tbody className="divide-y">
                       {order.ordersProducts.map((item, index) => (
                         <tr
-                          key={item._id || index}
+                          key={item.id || index}
                           className="hover:bg-slate-50"
                         >
                           <td className="p-2">

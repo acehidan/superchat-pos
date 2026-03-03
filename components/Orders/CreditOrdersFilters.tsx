@@ -49,7 +49,7 @@ export const CreditOrdersFilters: React.FC<CreditOrdersFiltersProps> = ({
           >
             <option value="all">All Storefronts</option>
             {storefronts.map((sf) => (
-              <option key={sf._id} value={sf._id}>
+              <option key={sf.id} value={sf.id}>
                 {sf.locationName || sf.storefrontName}
               </option>
             ))}

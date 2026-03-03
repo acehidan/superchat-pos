@@ -81,7 +81,7 @@ export const RemoveItemsFromOrderModal: React.FC<
       // Initialize selected items from order products
       const initialItems: SelectedItemToRemove[] =
         order.ordersProducts?.map((item) => ({
-          inventoryId: item.inventoryId._id,
+          inventoryId: item.inventoryId.id,
           productName: item.inventoryId.productName || "Unknown",
           productCode: item.inventoryId.productCode || "",
           currentQuantity: item.quantity,
@@ -251,7 +251,7 @@ export const RemoveItemsFromOrderModal: React.FC<
         paidAmount: totals.paidAmount,
       };
 
-      const response = await removeItemsFromOrder(order._id, payload);
+      const response = await removeItemsFromOrder(order.id, payload);
 
       if (response.success) {
         toast.success(
@@ -324,87 +324,92 @@ export const RemoveItemsFromOrderModal: React.FC<
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {selectedItems.map((item) => (
-                    <div
-                      key={item.inventoryId}
-                      className="bg-slate-50 p-3 rounded-lg border"
-                    >
-                      <div className="mb-2">
-                        <p className="font-medium text-slate-800 text-sm">
-                          {item.productName}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          {item.productCode}
-                        </p>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs text-slate-500 mb-1">
-                            {t("orders.currentQuantity") || "Current Qty"}:{" "}
-                            <span className="font-medium text-slate-700">
-                              {item.currentQuantity}
-                            </span>
-                          </p>
-                          <p className="text-xs text-slate-500">
-                            {t("orders.unitPrice") || "Unit Price"}:{" "}
-                            <span className="font-medium text-slate-700">
-                              {item.unitPrice.toLocaleString()} MMK
-                            </span>
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() =>
-                                handleQuantityChange(
-                                  item.inventoryId,
-                                  item.removeQuantity - 1,
-                                )
-                              }
-                              disabled={item.removeQuantity <= 0}
-                              className="w-6 h-6 rounded border flex items-center justify-center hover:bg-slate-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              -
-                            </button>
-                            <input
-                              type="number"
-                              min="0"
-                              max={item.currentQuantity}
-                              value={item.removeQuantity}
-                              onChange={(e) =>
-                                handleQuantityChange(
-                                  item.inventoryId,
-                                  parseInt(e.target.value) || 0,
-                                )
-                              }
-                              className="w-16 text-center border rounded py-1 text-sm"
-                            />
-                            <button
-                              onClick={() =>
-                                handleQuantityChange(
-                                  item.inventoryId,
-                                  item.removeQuantity + 1,
-                                )
-                              }
-                              disabled={
-                                item.removeQuantity >= item.currentQuantity
-                              }
-                              className="w-6 h-6 rounded border flex items-center justify-center hover:bg-slate-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              +
-                            </button>
+                  {selectedItems.map(
+                    (item) => (
+                      console.log(item),
+                      (
+                        <div
+                          key={item.inventoryId}
+                          className="bg-slate-50 p-3 rounded-lg border"
+                        >
+                          <div className="mb-2">
+                            <p className="font-medium text-slate-800 text-sm">
+                              {item.productName}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {item.productCode}
+                            </p>
                           </div>
-                          {/* {item.removeQuantity > 0 && (
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-xs text-slate-500 mb-1">
+                                {t("orders.currentQuantity") || "Current Qty"}:{" "}
+                                <span className="font-medium text-slate-700">
+                                  {item.currentQuantity}
+                                </span>
+                              </p>
+                              <p className="text-xs text-slate-500">
+                                {t("orders.unitPrice") || "Unit Price"}:{" "}
+                                <span className="font-medium text-slate-700">
+                                  {item.unitPrice.toLocaleString()} MMK
+                                </span>
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1">
+                                <button
+                                  onClick={() =>
+                                    handleQuantityChange(
+                                      item.inventoryId,
+                                      item.removeQuantity - 1,
+                                    )
+                                  }
+                                  disabled={item.removeQuantity <= 0}
+                                  className="w-6 h-6 rounded border flex items-center justify-center hover:bg-slate-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  -
+                                </button>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max={item.currentQuantity}
+                                  value={item.removeQuantity}
+                                  onChange={(e) =>
+                                    handleQuantityChange(
+                                      item.inventoryId,
+                                      parseInt(e.target.value) || 0,
+                                    )
+                                  }
+                                  className="w-16 text-center border rounded py-1 text-sm"
+                                />
+                                <button
+                                  onClick={() =>
+                                    handleQuantityChange(
+                                      item.inventoryId,
+                                      item.removeQuantity + 1,
+                                    )
+                                  }
+                                  disabled={
+                                    item.removeQuantity >= item.currentQuantity
+                                  }
+                                  className="w-6 h-6 rounded border flex items-center justify-center hover:bg-slate-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  +
+                                </button>
+                              </div>
+                              {/* {item.removeQuantity > 0 && (
                             <div className="text-right min-w-[90px]">
                               <p className="font-medium text-red-600 text-sm">
                                 -{item.subtotalToRemove.toLocaleString()} MMK
                               </p>
                             </div>
                           )} */}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  ))}
+                      )
+                    ),
+                  )}
                 </div>
               )}
             </div>

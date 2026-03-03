@@ -6,7 +6,7 @@ import {
   Box,
   RefreshCw,
   Search,
-  Filter,
+
   X,
   MessageSquare,
   Bot,
@@ -142,8 +142,7 @@ export const SocialMediaInventory: React.FC = () => {
 
       if (result.success) {
         toast.success(
-          `Stock ${
-            adjustmentType === "increase" ? "increased" : "decreased"
+          `Stock ${adjustmentType === "increase" ? "increased" : "decreased"
           } successfully!`,
         );
         setIsAdjustmentModalOpen(false);
@@ -424,11 +423,10 @@ export const SocialMediaInventory: React.FC = () => {
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <label
-                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                      adjustmentType === "increase"
+                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${adjustmentType === "increase"
                         ? "border-green-500 bg-green-50"
                         : "border-gray-300 hover:bg-gray-50"
-                    }`}
+                      }`}
                   >
                     <input
                       type="radio"
@@ -446,11 +444,10 @@ export const SocialMediaInventory: React.FC = () => {
                     <span className="font-medium">Increase</span>
                   </label>
                   <label
-                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                      adjustmentType === "decrease"
+                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${adjustmentType === "decrease"
                         ? "border-red-500 bg-red-50"
                         : "border-gray-300 hover:bg-gray-50"
-                    }`}
+                      }`}
                   >
                     <input
                       type="radio"

@@ -296,7 +296,7 @@ export const CreditOrders: React.FC = () => {
               </thead>
               <tbody className="divide-y">
                 {filteredOrders.map((order) => (
-                  <tr key={order._id} className="hover:bg-slate-50">
+                  <tr key={order.id} className="hover:bg-slate-50">
                     <td className="p-4">
                       <div className="font-medium text-slate-800">
                         {order.orderNumber}
@@ -320,10 +320,10 @@ export const CreditOrders: React.FC = () => {
                           <User className="w-4 h-4 text-slate-400" />
                           <div>
                             <div className="font-medium text-slate-800">
-                              {order.creditPersonId.name}
+                              {order?.creditPersonId?.name}
                             </div>
                             <div className="text-xs text-slate-500">
-                              {order.creditPersonId.phone}
+                              {order?.creditPersonId?.phone}
                             </div>
                           </div>
                         </div>
@@ -347,14 +347,14 @@ export const CreditOrders: React.FC = () => {
                     </td>
                     <td className="p-4">
                       <span className="font-medium text-orange-600">
-                        {order.remainingBalance.toLocaleString()} MMK
+                        {order?.remainingBalance?.toLocaleString()} MMK
                       </span>
                     </td>
 
                     <td className="p-4">
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => handleViewOrder(order._id)}
+                          onClick={() => handleViewOrder(order.id)}
                           className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded hover:bg-blue-200 border border-blue-200 font-medium transition-colors flex items-center gap-1"
                         >
                           <Eye className="w-3 h-3" />{" "}

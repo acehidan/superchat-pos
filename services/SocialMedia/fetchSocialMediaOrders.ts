@@ -46,16 +46,24 @@ export interface SocialMediaOrderResponse {
 
 export const fetchSocialMediaOrders = async (
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
+  status?: string,
+  platform?: string,
+  search?: string
 ): Promise<SocialMediaOrderResponse> => {
   try {
-    const response = await axios.get(`social-media-sale-order?page=${page}&limit=${limit}`);
-    
+    let url = `social-media-sale-order?page=${page}&limit=${limit}`;
+    if (status && status !== "all") url += `&orderStatus=${status}`;
+    if (platform && platform !== "all") url += `&platform=${platform}`;
+    if (search) url += `&search=${search}`;
+
+    const response = await axios.get(url);
+
     return {
       success: true,
-      message: "Social media sale orders retrieved successfully",
-      data: response.data.data,
-      pagination: response.data.pagination,
+      message: response.data.message || "Social media sale orders retrieved successfully",
+      data: response.data.data.data,
+      pagination: response.data.data.pagination,
     };
   } catch (error: any) {
     console.error("Error fetching social media orders:", error);

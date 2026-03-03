@@ -1,30 +1,40 @@
 import axios from "../axios";
 
 export interface TransferLineItem {
+  id: string;
   inventoryId: string;
   quantity: number;
   grnLineItemId: string;
   notes: string | null;
-  _id: string;
+  inventory: {
+    id: string;
+    productCode: string;
+    productName: string;
+  };
 }
 
 export interface TransferData {
-  _id: string;
+  id: string;
   transferNumber: string;
   sourceType: string;
   sourceId: string;
-  destinationWarehouseId: string;
-  destinationStorefrontId: string | null;
+  destinationType: string;
+  destinationId: string;
   lineItems: TransferLineItem[];
   status: string;
   transferDate: string;
   receivedDate: string | null;
   notes: string | null;
+  totalQuantity: number;
   isDeleted: boolean;
   deletedAt: string | null;
+  transferredBy: string;
   createdAt: string;
   updatedAt: string;
-  __v?: number;
+  admin: {
+    id: string;
+    name: string;
+  };
 }
 
 interface FetchTransfersResponse {

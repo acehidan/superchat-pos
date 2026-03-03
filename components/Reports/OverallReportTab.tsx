@@ -33,7 +33,7 @@ export const OverallReportTab: React.FC<OverallReportTabProps> = ({
       ? saleReports.filter((report) => report.success)
       : saleReports.filter(
           (report) =>
-            report.success && report.data.storefront._id === selectedStorefront
+            report.success && report.data.storefront.id === selectedStorefront,
         );
   return (
     <div className="space-y-6">
@@ -150,7 +150,7 @@ export const OverallReportTab: React.FC<OverallReportTabProps> = ({
               <tbody className="divide-y">
                 {reportsToShow.map((report) => (
                   <tr
-                    key={report.data.storefront._id}
+                    key={report.data.storefront.id}
                     className="hover:bg-slate-50"
                   >
                     <td className="px-4 py-3">

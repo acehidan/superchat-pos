@@ -82,7 +82,7 @@ export const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
           storefrontName?: string;
         }
       | null
-      | undefined
+      | undefined,
   ): string => {
     if (!value) return "-";
     if (typeof value === "string") return value;
@@ -104,7 +104,7 @@ export const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
           storefrontName?: string;
         }
       | null
-      | undefined
+      | undefined,
   ): string => {
     if (!value) return "-";
     if (typeof value === "string") return value;
@@ -182,7 +182,7 @@ export const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
               </div>
               <span
                 className={`inline-block px-3 py-1 rounded-full text-sm font-bold border ${getStatusColor(
-                  transfer.status
+                  transfer.status,
                 )}`}
               >
                 {transfer.status.toUpperCase()}
@@ -210,53 +210,18 @@ export const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
               )}
             </div>
 
-            {transfer.destinationWarehouseId === null ? (
-              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                <div className="flex items-center gap-2 text-green-700 text-sm font-semibold mb-2">
-                  <Warehouse className="w-4 h-4" />
-                  Destination Storefront
-                </div>
-                <div
-                  className="text-green-800 font-mono text-sm truncate"
-                  title={getDisplayId(transfer.destinationStorefrontId as any)}
-                >
-                  {getDisplayName(transfer.destinationStorefrontId as any)}
-                </div>
-                {typeof transfer.destinationStorefrontId === "object" &&
-                  transfer.destinationStorefrontId && (
-                    <div className="text-green-600 text-xs mt-1">
-                      ID:{" "}
-                      {(transfer.destinationStorefrontId as any)._id?.substring(
-                        0,
-                        12
-                      ) || "-"}
-                    </div>
-                  )}
+            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+              <div className="flex items-center gap-2 text-green-700 text-sm font-semibold mb-2">
+                <Warehouse className="w-4 h-4" />
+                Destination ({transfer.destinationType})
               </div>
-            ) : (
-              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                <div className="flex items-center gap-2 text-green-700 text-sm font-semibold mb-2">
-                  <Warehouse className="w-4 h-4" />
-                  Destination Warehouse
-                </div>
-                <div
-                  className="text-green-800 font-mono text-sm truncate"
-                  title={getDisplayId(transfer.destinationWarehouseId as any)}
-                >
-                  {getDisplayName(transfer.destinationWarehouseId as any)}
-                </div>
-                {typeof transfer.destinationWarehouseId === "object" &&
-                  transfer.destinationWarehouseId && (
-                    <div className="text-green-600 text-xs mt-1">
-                      ID:{" "}
-                      {(transfer.destinationWarehouseId as any)._id?.substring(
-                        0,
-                        12
-                      ) || "-"}
-                    </div>
-                  )}
+              <div
+                className="text-green-800 font-mono text-sm truncate"
+                title={transfer.destinationId}
+              >
+                {transfer.destinationId}
               </div>
-            )}
+            </div>
           </div>
 
           {/* Summary Stats */}
@@ -318,10 +283,15 @@ export const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
                 </thead>
                 <tbody className="divide-y">
                   {transfer.lineItems.map((item, index) => (
-                    <tr key={item._id} className="hover:bg-slate-50">
+                    <tr key={item.id} className="hover:bg-slate-50">
                       <td className="p-3 text-slate-500">{index + 1}</td>
-                      <td className="p-3 font-mono text-xs truncate max-w-xs">
-                        {item.inventoryId?.productName || "-"}
+                      <td className="p-3">
+                        <div className="font-medium">
+                          {item.inventory?.productName || "Unknown Product"}
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          {item.inventory?.productCode || "-"}
+                        </div>
                       </td>
                       <td className="p-3 text-center">
                         <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded font-medium">
@@ -330,20 +300,10 @@ export const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
                       </td>
                       <td
                         className="p-3 font-mono text-xs truncate max-w-xs"
-                        title={
-                          item.grnLineItemId
-                            ? typeof item.grnLineItemId === "string"
-                              ? item.grnLineItemId
-                              : (item.grnLineItemId as any)?._id || "-"
-                            : "-"
-                        }
+                        title={item.grnLineItemId || "-"}
                       >
                         {item.grnLineItemId
-                          ? typeof item.grnLineItemId === "string"
-                            ? item.grnLineItemId.substring(0, 12).concat("...")
-                            : (item.grnLineItemId as any)?._id
-                                ?.substring(0, 12)
-                                ?.concat("...") || "-"
+                          ? item.grnLineItemId.substring(0, 12).concat("...")
                           : "-"}
                       </td>
                       <td className="p-3 text-slate-500">

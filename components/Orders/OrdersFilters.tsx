@@ -59,7 +59,7 @@ export const OrdersFilters: React.FC<OrdersFiltersProps> = ({
           >
             <option value="all">All Storefronts</option>
             {storefronts.map((sf) => (
-              <option key={sf._id} value={sf._id}>
+              <option key={sf.id} value={sf.id}>
                 {sf.locationName}
               </option>
             ))}

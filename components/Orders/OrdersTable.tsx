@@ -69,7 +69,7 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
         </thead>
         <tbody className="divide-y">
           {orders.map((order) => (
-            <tr key={order._id} className="hover:bg-slate-50">
+            <tr key={order.id} className="hover:bg-slate-50">
               <td className="p-4 font-medium text-blue-600">
                 {order.orderNumber}
               </td>
@@ -151,7 +151,10 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
               <td className="p-4">
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => onViewOrder(order.id)}
+                    onClick={() => {
+                      onViewOrder(order.id);
+                      console.log(order);
+                    }}
                     className="text-xs bg-primary/20 text-yellow-800 px-3 py-1.5 rounded hover:bg-primary/30 border border-primary/30 font-medium transition-colors flex items-center gap-1"
                   >
                     <Eye className="w-3 h-3" />{" "}

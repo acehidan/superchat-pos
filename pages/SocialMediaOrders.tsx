@@ -33,15 +33,23 @@ export const SocialMediaOrdersPage: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [platformFilter, setPlatformFilter] = useState<string>("all");
+  const [totalItems, setTotalItems] = useState(0);
 
   const loadOrders = async () => {
     setLoading(true);
     try {
-      const response = await fetchSocialMediaOrders(currentPage, 10);
+      const response = await fetchSocialMediaOrders(
+        currentPage,
+        10,
+        statusFilter,
+        platformFilter,
+        searchTerm
+      );
 
       if (response.success && response.data) {
         setOrders(response.data);
         setTotalPages(response.pagination.totalPages);
+        setTotalItems(response.pagination.totalItems);
       } else {
         toast.error(response.message || "Failed to load social media orders");
       }
@@ -54,25 +62,15 @@ export const SocialMediaOrdersPage: React.FC = () => {
   };
 
   useEffect(() => {
-    loadOrders();
-  }, [currentPage]);
+    const delayDebounceFn = setTimeout(() => {
+      loadOrders();
+    }, 500);
 
-  // Filter orders based on search and filters
-  const filteredOrders = orders.filter((order) => {
-    const matchesSearch =
-      order.socialMediaSaleOrderNumber
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customerPhoneNumber.includes(searchTerm);
+    return () => clearTimeout(delayDebounceFn);
+  }, [currentPage, statusFilter, platformFilter, searchTerm]);
 
-    const matchesStatus =
-      statusFilter === "all" || order.orderStatus === statusFilter;
-    const matchesPlatform =
-      platformFilter === "all" || order.platform === platformFilter;
-
-    return matchesSearch && matchesStatus && matchesPlatform;
-  });
+  // No longer need client-side filtering as it's handled by the API
+  const filteredOrders = orders;
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -201,7 +199,7 @@ export const SocialMediaOrdersPage: React.FC = () => {
               Total Orders
             </label>
             <div className="px-3 py-2 bg-slate-100 rounded-lg text-slate-700 font-medium">
-              {filteredOrders.length} orders
+              {totalItems} orders
             </div>
           </div>
         </div>
@@ -283,6 +281,14 @@ export const SocialMediaOrdersPage: React.FC = () => {
                           <MapPin className="w-3 h-3" />
                           {order.customerAddress}
                         </div>
+                        <div className="mt-1">
+                          <span
+                            className={`text-[10px] px-1.5 py-0.5 rounded font-medium inline-flex items-center gap-1 ${getDeliveryColor(order.deliveryOption)}`}
+                          >
+                            <Truck className="w-2.5 h-2.5" />
+                            {order.deliveryOption.replace(/-/g, " ")}
+                          </span>
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -293,29 +299,49 @@ export const SocialMediaOrdersPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="space-y-1">
-                        {order.orderProducts.map((product, index) => (
+                      <div className="space-y-1.5">
+                        {order.orderProducts.map((product) => (
                           <div
                             key={product.id}
                             className="text-xs text-slate-600"
                           >
-                            {product.quantity} × {product.inventory.productName}
-                            <span className="text-slate-400 ml-1">
-                              ({product.inventory.productCode})
-                            </span>
+                            <div className="flex items-start gap-1">
+                              <span className="font-semibold text-slate-900">{product.quantity}x</span>
+                              <span className="truncate max-w-[150px]">{product.inventory.productName}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
+                              <span className="bg-slate-100 px-1 rounded">{product.inventory.productCode}</span>
+                              <span>•</span>
+                              <span>{parseFloat(product.unitPrice).toLocaleString()} MMK</span>
+                            </div>
                           </div>
                         ))}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-slate-900">
+                      <div className="text-sm font-bold text-slate-900">
                         {order.finalAmount.toLocaleString()} MMK
                       </div>
-                      {order.paidAmount > 0 && (
-                        <div className="text-xs text-green-600">
-                          Paid: {order.paidAmount.toLocaleString()} MMK
-                        </div>
-                      )}
+                      <div className="space-y-0.5 mt-1">
+                        {order.discount > 0 && (
+                          <div className="text-[10px] text-red-500 flex items-center gap-1">
+                            <span className="w-1 h-1 rounded-full bg-red-500"></span>
+                            Disc: -{order.discount.toLocaleString()}
+                          </div>
+                        )}
+                        {order.tax > 0 && (
+                          <div className="text-[10px] text-slate-500 flex items-center gap-1">
+                            <span className="w-1 h-1 rounded-full bg-slate-400"></span>
+                            Tax: +{order.tax.toLocaleString()}
+                          </div>
+                        )}
+                        {order.paidAmount > 0 && (
+                          <div className="text-[10px] text-green-600 font-medium flex items-center gap-1">
+                            <span className="w-1 h-1 rounded-full bg-green-500"></span>
+                            Paid: {order.paidAmount.toLocaleString()}
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span

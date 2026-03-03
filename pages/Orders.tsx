@@ -110,7 +110,7 @@ export const Orders: React.FC = () => {
         if (selectedStorefrontId !== "all") {
           filteredOrders = response.data.filter(
             (order) =>
-              order.storefrontId?._id === selectedStorefrontId ||
+              order.storefrontId?.id === selectedStorefrontId ||
               order.storefrontId?.id === selectedStorefrontId,
           );
         }
@@ -162,10 +162,10 @@ export const Orders: React.FC = () => {
   };
 
   const handleRefreshOrderDetails = async () => {
-    if (selectedOrder?._id) {
+    if (selectedOrder?.id) {
       setLoadingDetail(true);
       try {
-        const response = await fetchOrderById(selectedOrder._id);
+        const response = await fetchOrderById(selectedOrder.id);
         if (response.success && response.data) {
           setSelectedOrder(response.data);
         }
@@ -188,7 +188,7 @@ export const Orders: React.FC = () => {
     setAssigningCreditPerson(true);
     try {
       const response = await assignCreditPerson(
-        selectedOrderForCredit._id,
+        selectedOrderForCredit.id,
         creditPersonId,
       );
       if (response.success) {

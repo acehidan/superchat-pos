@@ -301,91 +301,99 @@ export const TransferWarehouseModal: React.FC<TransferWarehouseModalProps> = ({
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {transferItems.map((item, index) => (
-                    <div
-                      key={index}
-                      className={`border rounded-lg p-4 shadow-sm ${
-                        item.isSelected
-                          ? "bg-white border-blue-300"
-                          : "bg-gray-50 border-gray-200 opacity-60"
-                      }`}
-                    >
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="checkbox"
-                            checked={item.isSelected}
-                            onChange={(e) =>
-                              updateTransferSelection(index, e.target.checked)
-                            }
-                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                          />
-                          <div>
-                            <div className="font-semibold text-slate-800">
-                              {item.productName}
-                              <span className="text-xs text-gray-500 font-normal ml-2">
-                                ({item.productCode})
-                              </span>
-                            </div>
-                            <div className="text-xs text-slate-500">
-                              Available: {item.availableQuantity}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      {item.isSelected && (
-                        <div className="space-y-3 ml-7">
-                          <div className="col-span-2">
-                            <label className="text-xs text-slate-500 block mb-1">
-                              Item Notes:
-                            </label>
-                            <input
-                              type="text"
-                              className="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500"
-                              value={item.notes || ""}
-                              onChange={(e) =>
-                                updateTransferNotes(index, e.target.value)
-                              }
-                              placeholder="Optional notes..."
-                            />
-                          </div>
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="bg-green-50 p-2 rounded border border-green-200">
-                              <label className="text-xs text-green-600">
-                                Available:
-                              </label>
-                              <div className="font-semibold text-green-700">
-                                {item.availableQuantity}
-                              </div>
-                            </div>
-                            <div className="bg-green-50 p-2 rounded border border-green-200">
-                              <label className="text-xs text-slate-500 block mb-1">
-                                Transfer Qty:
-                              </label>
+                  {transferItems.map(
+                    (item, index) => (
+                      console.log(item),
+                      (
+                        <div
+                          key={index}
+                          className={`border rounded-lg p-4 shadow-sm ${
+                            item.isSelected
+                              ? "bg-white border-blue-300"
+                              : "bg-gray-50 border-gray-200 opacity-60"
+                          }`}
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-3">
                               <input
-                                type="number"
-                                className="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500"
-                                value={item.quantity}
+                                type="checkbox"
+                                checked={item.isSelected}
                                 onChange={(e) =>
-                                  updateTransferQuantity(
+                                  updateTransferSelection(
                                     index,
-                                    Number(e.target.value),
+                                    e.target.checked,
                                   )
                                 }
-                                min="0"
-                                max={item.availableQuantity}
+                                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                               />
+                              <div>
+                                <div className="font-semibold text-slate-800">
+                                  {item.productName}
+                                  <span className="text-xs text-gray-500 font-normal ml-2">
+                                    ({item.productCode})
+                                  </span>
+                                </div>
+                                <div className="text-xs text-slate-500">
+                                  Available: {item.availableQuantity}
+                                </div>
+                              </div>
                             </div>
                           </div>
-                          {item.quantity > item.availableQuantity && (
-                            <div className="text-xs text-red-600 bg-red-50 p-2 rounded">
-                              ⚠ Cannot exceed available quantity
+                          {item.isSelected && (
+                            <div className="space-y-3 ml-7">
+                              <div className="col-span-2">
+                                <label className="text-xs text-slate-500 block mb-1">
+                                  Item Notes:
+                                </label>
+                                <input
+                                  type="text"
+                                  className="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500"
+                                  value={item.notes || ""}
+                                  onChange={(e) =>
+                                    updateTransferNotes(index, e.target.value)
+                                  }
+                                  placeholder="Optional notes..."
+                                />
+                              </div>
+                              <div className="grid grid-cols-2 gap-3">
+                                <div className="bg-green-50 p-2 rounded border border-green-200">
+                                  <label className="text-xs text-green-600">
+                                    Available:
+                                  </label>
+                                  <div className="font-semibold text-green-700">
+                                    {item.availableQuantity}
+                                  </div>
+                                </div>
+                                <div className="bg-green-50 p-2 rounded border border-green-200">
+                                  <label className="text-xs text-slate-500 block mb-1">
+                                    Transfer Qty:
+                                  </label>
+                                  <input
+                                    type="number"
+                                    className="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500"
+                                    value={item.quantity}
+                                    onChange={(e) =>
+                                      updateTransferQuantity(
+                                        index,
+                                        Number(e.target.value),
+                                      )
+                                    }
+                                    min="0"
+                                    max={item.availableQuantity}
+                                  />
+                                </div>
+                              </div>
+                              {item.quantity > item.availableQuantity && (
+                                <div className="text-xs text-red-600 bg-red-50 p-2 rounded">
+                                  ⚠ Cannot exceed available quantity
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
-                      )}
-                    </div>
-                  ))}
+                      )
+                    ),
+                  )}
                 </div>
               )}
             </div>

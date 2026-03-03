@@ -45,7 +45,7 @@ export const AccountManagement: React.FC = () => {
   // Edit Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<AdminAccount | null>(
-    null
+    null,
   );
   const [editFormData, setEditFormData] = useState({
     name: "",
@@ -56,13 +56,13 @@ export const AccountManagement: React.FC = () => {
   // Delete Confirmation Modal State
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [accountToDelete, setAccountToDelete] = useState<AdminAccount | null>(
-    null
+    null,
   );
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Restore State
   const [restoringAccountId, setRestoringAccountId] = useState<string | null>(
-    null
+    null,
   );
 
   // Hard Delete Modal State
@@ -84,7 +84,7 @@ export const AccountManagement: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [locationProfiles, setLocationProfiles] = useState<LocationProfile[]>(
-    []
+    [],
   );
 
   useEffect(() => {
@@ -107,7 +107,7 @@ export const AccountManagement: React.FC = () => {
           (location) =>
             location.status === "active" &&
             !location.isDeleted &&
-            !location.deletedAt
+            !location.deletedAt,
         );
         // console.log("Active locations after filter:", activeLocations);
 
@@ -117,7 +117,7 @@ export const AccountManagement: React.FC = () => {
         } else {
           // Fallback: show all non-deleted locations
           const nonDeleted = locations.filter(
-            (location) => !location.isDeleted && !location.deletedAt
+            (location) => !location.isDeleted && !location.deletedAt,
           );
           // console.log("No active locations, using non-deleted:", nonDeleted);
           setLocationProfiles(nonDeleted);
@@ -209,14 +209,14 @@ export const AccountManagement: React.FC = () => {
       statusFilter === "all"
         ? true
         : statusFilter === "active"
-        ? !account.softDeleted && !account.deletedAt
-        : account.softDeleted || !!account.deletedAt;
+          ? !account.softDeleted && !account.deletedAt
+          : account.softDeleted || !!account.deletedAt;
 
     return matchesSearch && matchesRole && matchesStatus;
   });
 
   const uniqueRoles = Array.from(
-    new Set(accounts.map((a) => a.role).filter(Boolean))
+    new Set(accounts.map((a) => a.role).filter(Boolean)),
   );
 
   // Available roles for selection
@@ -257,7 +257,7 @@ export const AccountManagement: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const response = await updateAdminAccount(selectedAccount._id, {
+      const response = await updateAdminAccount(selectedAccount.id, {
         name: editFormData.name.trim(),
         role: editFormData.role,
       });
@@ -292,11 +292,11 @@ export const AccountManagement: React.FC = () => {
 
     setIsDeleting(true);
     try {
-      const response = await softDeleteAdminAccount(accountToDelete._id);
+      const response = await softDeleteAdminAccount(accountToDelete.id);
 
       if (response.success) {
         toast.success(
-          `Account "${response.data.name}" deactivated successfully!`
+          `Account "${response.data.name}" deactivated successfully!`,
         );
         handleCloseDeleteModal();
         loadAccounts(); // Refresh the list
@@ -312,9 +312,9 @@ export const AccountManagement: React.FC = () => {
   };
 
   const handleRestoreAccount = async (account: AdminAccount) => {
-    setRestoringAccountId(account._id);
+    setRestoringAccountId(account.id);
     try {
-      const response = await restoreAdminAccount(account._id);
+      const response = await restoreAdminAccount(account.id);
 
       if (response.success) {
         toast.success(`Account "${response.data.name}" restored successfully!`);
@@ -345,11 +345,11 @@ export const AccountManagement: React.FC = () => {
 
     setIsHardDeleting(true);
     try {
-      const response = await deleteAdminAccount(accountToHardDelete._id);
+      const response = await deleteAdminAccount(accountToHardDelete.id);
 
       if (response.success) {
         toast.success(
-          `Account "${accountToHardDelete.name}" permanently deleted!`
+          `Account "${accountToHardDelete.name}" permanently deleted!`,
         );
         handleCloseHardDeleteModal();
         loadAccounts(); // Refresh the list
@@ -429,10 +429,10 @@ export const AccountManagement: React.FC = () => {
   };
 
   const activeCount = accounts.filter(
-    (a) => !a.softDeleted && !a.deletedAt
+    (a) => !a.softDeleted && !a.deletedAt,
   ).length;
   const deletedCount = accounts.filter(
-    (a) => a.softDeleted || !!a.deletedAt
+    (a) => a.softDeleted || !!a.deletedAt,
   ).length;
 
   return (
@@ -607,7 +607,7 @@ export const AccountManagement: React.FC = () => {
             </thead>
             <tbody className="divide-y">
               {filteredAccounts.map((account) => (
-                <tr key={account._id} className="hover:bg-slate-50">
+                <tr key={account.id} className="hover:bg-slate-50">
                   <td className="p-4">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
@@ -621,7 +621,7 @@ export const AccountManagement: React.FC = () => {
                   <td className="p-4">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-bold ${getRoleColor(
-                        account.role
+                        account.role,
                       )}`}
                     >
                       {account.role?.toUpperCase()}
@@ -675,10 +675,10 @@ export const AccountManagement: React.FC = () => {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => handleRestoreAccount(account)}
-                            disabled={restoringAccountId === account._id}
+                            disabled={restoringAccountId === account.id}
                             className="text-xs bg-green-50 text-green-600 px-3 py-1.5 rounded hover:bg-green-100 border border-green-200 font-medium transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            {restoringAccountId === account._id ? (
+                            {restoringAccountId === account.id ? (
                               <>
                                 <Loader2 className="w-3 h-3 animate-spin" />{" "}
                                 Restoring...
@@ -693,12 +693,12 @@ export const AccountManagement: React.FC = () => {
                             onClick={() => handleOpenHardDeleteModal(account)}
                             disabled={
                               isHardDeleting &&
-                              accountToHardDelete?._id === account._id
+                              accountToHardDelete?.id === account.id
                             }
                             className="text-xs bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700 border border-red-700 font-medium transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {isHardDeleting &&
-                            accountToHardDelete?._id === account._id ? (
+                            accountToHardDelete?.id === account.id ? (
                               <>
                                 <Loader2 className="w-3 h-3 animate-spin" />{" "}
                                 Deleting...
@@ -781,7 +781,7 @@ export const AccountManagement: React.FC = () => {
                 <div className="flex justify-between">
                   <span className="text-slate-500">Account ID:</span>
                   <span className="font-mono text-slate-700">
-                    {selectedAccount._id}
+                    {selectedAccount.id}
                   </span>
                 </div>
                 {selectedAccount.locationId && (
@@ -878,7 +878,7 @@ export const AccountManagement: React.FC = () => {
                 <div className="flex justify-between">
                   <span className="text-slate-500">Account ID:</span>
                   <span className="font-mono text-slate-700 text-xs">
-                    {accountToDelete._id}
+                    {accountToDelete.id}
                   </span>
                 </div>
               </div>
@@ -972,7 +972,7 @@ export const AccountManagement: React.FC = () => {
                 <div className="flex justify-between">
                   <span className="text-slate-500">Account ID:</span>
                   <span className="font-mono text-slate-700 text-xs">
-                    {accountToHardDelete._id}
+                    {accountToHardDelete.id}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -1098,26 +1098,26 @@ export const AccountManagement: React.FC = () => {
                   ) : (
                     <>
                       {locationProfiles.filter(
-                        (loc) => loc.type === "storefront"
+                        (loc) => loc.type === "storefront",
                       ).length > 0 && (
                         <optgroup label="Storefronts">
                           {locationProfiles
                             .filter((loc) => loc.type === "storefront")
                             .map((loc) => (
-                              <option key={loc._id} value={loc._id}>
+                              <option key={loc.id} value={loc.id}>
                                 {loc.locationName} ({loc.locationCode})
                               </option>
                             ))}
                         </optgroup>
                       )}
                       {locationProfiles.filter(
-                        (loc) => loc.type === "warehouse"
+                        (loc) => loc.type === "warehouse",
                       ).length > 0 && (
                         <optgroup label="Warehouses">
                           {locationProfiles
                             .filter((loc) => loc.type === "warehouse")
                             .map((loc) => (
-                              <option key={loc._id} value={loc._id}>
+                              <option key={loc.id} value={loc.id}>
                                 {loc.locationName} ({loc.locationCode})
                               </option>
                             ))}
@@ -1125,10 +1125,10 @@ export const AccountManagement: React.FC = () => {
                       )}
                       {locationProfiles.length > 0 &&
                         locationProfiles.filter(
-                          (loc) => loc.type === "storefront"
+                          (loc) => loc.type === "storefront",
                         ).length === 0 &&
                         locationProfiles.filter(
-                          (loc) => loc.type === "warehouse"
+                          (loc) => loc.type === "warehouse",
                         ).length === 0 && (
                           <option disabled>
                             No active locations available

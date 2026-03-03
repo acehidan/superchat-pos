@@ -69,7 +69,7 @@ export const Credits: React.FC = () => {
   };
 
   const handleOpenEditModal = (persona: CreditPersona) => {
-    setEditingId(persona._id);
+    setEditingId(persona.id);
     setFormData({ name: persona.name, phone: persona.phone });
     setIsAddModalOpen(true);
   };
@@ -140,7 +140,7 @@ export const Credits: React.FC = () => {
   };
 
   const handleViewPersona = (persona: CreditPersona) => {
-    navigate(`/credits/${persona._id}`, {
+    navigate(`/credits/${persona.id}`, {
       state: { name: persona.name, phone: persona.phone },
     });
   };
@@ -288,7 +288,7 @@ export const Credits: React.FC = () => {
             </thead>
             <tbody className="divide-y">
               {filteredPersonas.map((persona) => (
-                <tr key={persona._id} className="hover:bg-slate-50">
+                <tr key={persona.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
