@@ -43,7 +43,7 @@ export const OverallReportTab: React.FC<OverallReportTabProps> = ({
             Total Sales
           </p>
           <p className="text-2xl font-bold text-slate-900">
-            {displayReport.finalAmount.toLocaleString()} MMK
+            {displayReport?.finalAmount?.toLocaleString()} MMK
           </p>
         </div>
         <div className="bg-white p-4 rounded-xl shadow border border-green-100">
@@ -51,7 +51,7 @@ export const OverallReportTab: React.FC<OverallReportTabProps> = ({
             Paid Amount
           </p>
           <p className="text-2xl font-bold text-green-600">
-            {displayReport.paidAmount.toLocaleString()} MMK
+            {displayReport?.paidAmount?.toLocaleString()} MMK
           </p>
         </div>
         <div className="bg-white p-4 rounded-xl shadow border border-purple-100">
@@ -59,10 +59,11 @@ export const OverallReportTab: React.FC<OverallReportTabProps> = ({
             Credit Amount
           </p>
           <p className="text-2xl font-bold text-purple-600">
-            {(
-              displayReport.finalAmount - displayReport.paidAmount
-            ).toLocaleString()}{" "}
-            MMK
+            {displayReport.finalAmount && displayReport.paidAmout
+              ? (
+                  displayReport.finalAmount - displayReport.paidAmount
+                ).toLocaleString()
+              : "-  "}
           </p>
         </div>
         <div className="bg-white p-4 rounded-xl shadow border border-blue-100">
@@ -164,25 +165,25 @@ export const OverallReportTab: React.FC<OverallReportTabProps> = ({
                       </div>
                     </td>
                     <td className="px-4 py-3 text-right font-bold text-slate-800">
-                      {report.data.report.finalAmount.toLocaleString()} MMK
+                      {report?.data?.report?.finalAmount?.toLocaleString()} MMK
                     </td>
                     <td className="px-4 py-3 text-right text-green-600">
-                      {report.data.report.paidAmount.toLocaleString()} MMK
+                      {report?.data?.report?.paidAmount?.toLocaleString()} MMK
                     </td>
                     <td className="px-4 py-3 text-right text-slate-600">
-                      {report.data.report.subTotal.toLocaleString()} MMK
+                      {report?.data?.report?.subTotal?.toLocaleString()} MMK
                     </td>
                     <td className="px-4 py-3 text-right text-amber-600">
-                      {report.data.report.discount.toLocaleString()} MMK
+                      {report?.data?.report?.discount?.toLocaleString()} MMK
                     </td>
                     <td className="px-4 py-3 text-right text-blue-600">
-                      {report.data.report.orderCount}
+                      {report?.data?.report?.orderCount}
                     </td>
                     <td className="px-4 py-3 text-right text-green-600">
-                      {report.data.report.paidOrderCount}
+                      {report?.data?.report?.paidOrderCount}
                     </td>
                     <td className="px-4 py-3 text-right text-red-600">
-                      {report.data.report.creditOrderCount}
+                      {report?.data?.report?.creditOrderCount}
                     </td>
                   </tr>
                 ))}

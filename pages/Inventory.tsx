@@ -73,6 +73,9 @@ export const Inventory: React.FC = () => {
   // Search State
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Reset trigger for ProductModal internal state
+  const [resetTrigger, setResetTrigger] = useState(0);
+
   // Form State - API structure
   const [formData, setFormData] = useState<ProductFormData>({
     productName: "",
@@ -225,6 +228,8 @@ export const Inventory: React.FC = () => {
       tags: [],
     });
     setError(null);
+    // Trigger reset of ProductModal internal state
+    setResetTrigger((prev) => prev + 1);
   };
 
   const handleSave = async () => {
@@ -807,6 +812,7 @@ export const Inventory: React.FC = () => {
         isLoading={isLoading}
         products={products}
         apiProducts={apiProducts}
+        resetTrigger={resetTrigger}
         onClose={() => {
           setIsModalOpen(false);
           setEditingId(null);

@@ -81,6 +81,7 @@ interface ProductModalProps {
   isLoading: boolean;
   products: Product[];
   apiProducts: ApiProduct[];
+  resetTrigger: number; // Add this to trigger internal state reset
   onClose: () => void;
   onSave: () => void;
   onFormDataChange: (data: ProductFormData) => void;
@@ -93,7 +94,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   error,
   isLoading,
   products,
-
+  resetTrigger,
   onClose,
   onSave,
   onFormDataChange,
@@ -103,6 +104,12 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   // Combobox states for category and subCategory
   const [categoryInput, setCategoryInput] = useState("");
   const [categoryShowDropdown, setCategoryShowDropdown] = useState(false);
+
+  // Reset category input when resetTrigger changes
+  React.useEffect(() => {
+    setCategoryInput("");
+    setCategoryShowDropdown(false);
+  }, [resetTrigger]);
 
   // Image upload state
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);

@@ -53,10 +53,10 @@ export const PODetailModal: React.FC<PODetailModalProps> = ({
     }
   };
 
-  const getSupplierName = (supplierId: string) => {
-    const supplier = suppliers.find((s) => s.id === supplierId);
-    return supplier ? supplier.supplierName : "Unknown Supplier";
-  };
+  // const getSupplierName = (supplierId: string) => {
+  //   const supplier = suppliers.find((s) => s.id === supplierId);
+  //   return supplier ? supplier.supplierName : "Unknown Supplier";
+  // };
 
   const getProductStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -174,7 +174,7 @@ export const PODetailModal: React.FC<PODetailModalProps> = ({
                 Supplier Information
               </div>
               <div className="text-blue-800 font-medium text-lg">
-                {getSupplierName(purchase.supplierId)}
+                {purchase?.supplierId?.supplierName}
               </div>
             </div>
           </div>
